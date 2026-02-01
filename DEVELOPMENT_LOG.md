@@ -557,7 +557,10 @@ New indexes and functions for efficient filtering.
 ### Next Steps
 
 1. [x] Apply migration 086 to Supabase ✅ (2026-02-02)
-2. [ ] Run re-classification script: `python src/reclassify_existing.py`
+2. [x] Run re-classification script ✅ (2026-02-02)
+   - 487 items processed, 0 errors
+   - Results: 73% real_application, 6% case_study, 10% tech_demo
+   - Quality content: 392 items (80.5%)
 3. [ ] Update frontend UI components to display new badges
 4. [ ] Test filtering behavior
 
