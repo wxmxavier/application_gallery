@@ -17,22 +17,33 @@ ADD COLUMN IF NOT EXISTS specific_tasks TEXT[] DEFAULT '{}';
 ALTER TABLE application_gallery
 ADD COLUMN IF NOT EXISTS application_context JSONB DEFAULT '{}';
 
+-- Drop existing constraints if they exist, then add new ones
+DO $$
+BEGIN
+  -- Drop constraints if they exist
+  ALTER TABLE application_gallery DROP CONSTRAINT IF EXISTS gallery_content_type_check;
+  ALTER TABLE application_gallery DROP CONSTRAINT IF EXISTS gallery_deployment_maturity_check;
+  ALTER TABLE application_gallery DROP CONSTRAINT IF EXISTS gallery_educational_value_check;
+EXCEPTION
+  WHEN undefined_object THEN NULL;
+END $$;
+
 -- Add constraints
 ALTER TABLE application_gallery
-ADD CONSTRAINT IF NOT EXISTS gallery_content_type_check
+ADD CONSTRAINT gallery_content_type_check
 CHECK (content_type IN (
   'real_application', 'pilot_poc', 'case_study',
   'tech_demo', 'product_announcement', 'tutorial', 'unknown'
 ));
 
 ALTER TABLE application_gallery
-ADD CONSTRAINT IF NOT EXISTS gallery_deployment_maturity_check
+ADD CONSTRAINT gallery_deployment_maturity_check
 CHECK (deployment_maturity IN (
   'production', 'pilot', 'prototype', 'concept', 'unknown'
 ));
 
 ALTER TABLE application_gallery
-ADD CONSTRAINT IF NOT EXISTS gallery_educational_value_check
+ADD CONSTRAINT gallery_educational_value_check
 CHECK (educational_value BETWEEN 1 AND 5);
 
 -- Create indexes for new filters
@@ -59,7 +70,6 @@ CREATE INDEX IF NOT EXISTS idx_gallery_app_context
 ON application_gallery USING GIN(application_context);
 
 -- Update existing items to have default content_type based on relevance_score
--- Items with high relevance likely real applications, low relevance likely demos
 UPDATE application_gallery
 SET content_type = CASE
   WHEN ai_classification->>'relevance_score' IS NOT NULL
@@ -180,7 +190,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Add comment explaining the new classification system
+-- Add comments explaining the new classification system
 COMMENT ON COLUMN application_gallery.content_type IS
 'V2 Classification: real_application, pilot_poc, case_study, tech_demo, product_announcement, tutorial';
 
