@@ -1,6 +1,6 @@
 import { Play, FileText, Image, ExternalLink } from 'lucide-react';
 import type { GalleryItem } from '../types/gallery';
-import { CATEGORY_INFO, SCENE_INFO } from '../types/gallery';
+import { CATEGORY_INFO, SCENE_INFO, CONTENT_TYPE_INFO, EDUCATIONAL_VALUE_INFO } from '../types/gallery';
 
 interface GalleryCardProps {
   item: GalleryItem;
@@ -10,6 +10,8 @@ interface GalleryCardProps {
 export default function GalleryCard({ item, onClick }: GalleryCardProps) {
   const categoryInfo = CATEGORY_INFO[item.application_category];
   const sceneInfo = item.scene_type ? SCENE_INFO[item.scene_type] : null;
+  const contentTypeInfo = item.content_type ? CONTENT_TYPE_INFO[item.content_type] : null;
+  const educationalInfo = item.educational_value ? EDUCATIONAL_VALUE_INFO[item.educational_value] : null;
 
   // Format duration
   const formatDuration = (seconds?: number) => {
@@ -58,15 +60,24 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
           </div>
         )}
 
-        {/* Media type badge */}
-        <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 text-gray-700 text-xs rounded flex items-center gap-1">
-          <MediaIcon className="w-3 h-3" />
-          {item.media_type === 'video' ? 'Video' : (item.media_type === 'photo' || item.media_type === 'image') ? 'Image' : 'Article'}
-        </div>
+        {/* Content Type Badge (V2) - Top Left */}
+        {contentTypeInfo && (
+          <div className={`absolute top-2 left-2 px-2 py-1 text-xs rounded flex items-center gap-1 border ${contentTypeInfo.color}`}>
+            <span>{contentTypeInfo.icon}</span>
+            <span className="font-medium">{contentTypeInfo.label}</span>
+          </div>
+        )}
 
-        {/* Featured badge */}
+        {/* Educational Value Stars (V2) - Top Right */}
+        {educationalInfo && item.educational_value >= 3 && (
+          <div className="absolute top-2 right-2 px-2 py-1 bg-black/75 text-yellow-400 text-xs rounded" title={educationalInfo.label}>
+            {educationalInfo.stars}
+          </div>
+        )}
+
+        {/* Featured badge - moves to bottom left if content type badge present */}
         {item.featured && (
-          <div className="absolute top-2 right-2 px-2 py-1 bg-yellow-400 text-yellow-900 text-xs font-semibold rounded">
+          <div className="absolute bottom-2 left-2 px-2 py-1 bg-yellow-400 text-yellow-900 text-xs font-semibold rounded">
             Featured
           </div>
         )}
@@ -82,11 +93,11 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
         {/* Source */}
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
           <ExternalLink className="w-3 h-3" />
-          <span>{item.source_name}</span>
+          <span className="truncate">{item.source_name}</span>
           {item.published_at && (
             <>
               <span>•</span>
-              <span>{new Date(item.published_at).toLocaleDateString()}</span>
+              <span className="whitespace-nowrap">{new Date(item.published_at).toLocaleDateString()}</span>
             </>
           )}
         </div>
@@ -98,15 +109,15 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
           </span>
           {sceneInfo && (
             <span className="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700">
-              📍 {sceneInfo.label}
+              {sceneInfo.label}
             </span>
           )}
         </div>
 
-        {/* Task Types */}
-        {item.task_types.length > 0 && (
+        {/* Task Types - Show specific_tasks if available, fallback to task_types */}
+        {(item.specific_tasks?.length > 0 || item.task_types?.length > 0) && (
           <div className="flex flex-wrap gap-1">
-            {item.task_types.slice(0, 3).map((task) => (
+            {(item.specific_tasks?.length > 0 ? item.specific_tasks : item.task_types).slice(0, 3).map((task) => (
               <span
                 key={task}
                 className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded"
@@ -114,9 +125,9 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
                 {task.replace(/_/g, ' ')}
               </span>
             ))}
-            {item.task_types.length > 3 && (
+            {(item.specific_tasks?.length > 0 ? item.specific_tasks : item.task_types).length > 3 && (
               <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded">
-                +{item.task_types.length - 3}
+                +{(item.specific_tasks?.length > 0 ? item.specific_tasks : item.task_types).length - 3}
               </span>
             )}
           </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { X, ExternalLink, Eye, Calendar, Clock, ArrowRight } from 'lucide-react';
+import { X, ExternalLink, Eye, Calendar, Clock, ArrowRight, CheckCircle, Target, TrendingUp } from 'lucide-react';
 import type { GalleryItem } from '../types/gallery';
-import { CATEGORY_INFO, SCENE_INFO } from '../types/gallery';
+import { CATEGORY_INFO, SCENE_INFO, CONTENT_TYPE_INFO, EDUCATIONAL_VALUE_INFO } from '../types/gallery';
 import { incrementViewCount, getRelatedItems } from '../services/gallery-service';
 import GalleryCard from './GalleryCard';
 
@@ -15,6 +15,8 @@ export default function GalleryDetailModal({ item, onClose }: GalleryDetailModal
 
   const categoryInfo = CATEGORY_INFO[item.application_category];
   const sceneInfo = item.scene_type ? SCENE_INFO[item.scene_type] : null;
+  const contentTypeInfo = item.content_type ? CONTENT_TYPE_INFO[item.content_type] : null;
+  const educationalInfo = item.educational_value ? EDUCATIONAL_VALUE_INFO[item.educational_value] : null;
 
   // Increment view count and fetch related items
   useEffect(() => {
@@ -39,6 +41,32 @@ export default function GalleryDetailModal({ item, onClose }: GalleryDetailModal
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Format deployment scale
+  const formatDeploymentScale = (scale?: string) => {
+    const scaleLabels: Record<string, string> = {
+      single_unit: 'Single Unit',
+      small_fleet: 'Small Fleet (2-10)',
+      large_fleet: 'Large Fleet (10+)',
+      facility_wide: 'Facility-Wide',
+      multi_site: 'Multi-Site'
+    };
+    return scale ? scaleLabels[scale] || scale.replace(/_/g, ' ') : null;
+  };
+
+  // Format problem solved
+  const formatProblemSolved = (problem?: string) => {
+    const problemLabels: Record<string, string> = {
+      labor_shortage: 'Labor Shortage',
+      safety_hazard: 'Safety Hazard Reduction',
+      quality_consistency: 'Quality Consistency',
+      cost_reduction: 'Cost Reduction',
+      throughput: 'Throughput Improvement',
+      '24x7_operation': '24/7 Operation',
+      hazardous_environment: 'Hazardous Environment'
+    };
+    return problem ? problemLabels[problem] || problem.replace(/_/g, ' ') : null;
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
@@ -49,13 +77,34 @@ export default function GalleryDetailModal({ item, onClose }: GalleryDetailModal
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center z-10">
-          <h2 className="text-xl font-semibold text-gray-900 line-clamp-1">
-            {item.title}
-          </h2>
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-start z-10">
+          <div className="flex-1 pr-4">
+            {/* Content Type & Educational Value Badges */}
+            <div className="flex items-center gap-2 mb-2">
+              {contentTypeInfo && (
+                <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded border ${contentTypeInfo.color}`}>
+                  {contentTypeInfo.icon} {contentTypeInfo.label}
+                </span>
+              )}
+              {educationalInfo && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded bg-yellow-50 text-yellow-700 border border-yellow-200" title={`Educational Value: ${educationalInfo.label}`}>
+                  {educationalInfo.stars}
+                </span>
+              )}
+              {item.deployment_maturity && item.deployment_maturity !== 'unknown' && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded bg-gray-100 text-gray-600">
+                  {item.deployment_maturity === 'production' ? '🚀' : item.deployment_maturity === 'pilot' ? '🧪' : '🔬'}
+                  {item.deployment_maturity.charAt(0).toUpperCase() + item.deployment_maturity.slice(1)}
+                </span>
+              )}
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 line-clamp-2">
+              {item.title}
+            </h2>
+          </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full"
+            className="p-2 hover:bg-gray-100 rounded-full flex-shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
@@ -104,6 +153,46 @@ export default function GalleryDetailModal({ item, onClose }: GalleryDetailModal
                 </div>
               )}
 
+              {/* Application Context (V2) */}
+              {item.application_context && (Object.keys(item.application_context).length > 0) && (
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                  <h3 className="font-semibold text-purple-900 mb-3 flex items-center gap-2">
+                    <Target className="w-4 h-4" />
+                    Application Context
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    {item.application_context.problem_solved && (
+                      <div>
+                        <div className="text-purple-600 mb-1">Problem Solved</div>
+                        <div className="text-purple-900 font-medium">
+                          {formatProblemSolved(item.application_context.problem_solved)}
+                        </div>
+                      </div>
+                    )}
+                    {item.application_context.deployment_scale && (
+                      <div>
+                        <div className="text-purple-600 mb-1">Deployment Scale</div>
+                        <div className="text-purple-900 font-medium">
+                          {formatDeploymentScale(item.application_context.deployment_scale)}
+                        </div>
+                      </div>
+                    )}
+                    {item.application_context.customer_identified && (
+                      <div className="flex items-center gap-2 text-purple-800">
+                        <CheckCircle className="w-4 h-4 text-purple-600" />
+                        Customer Identified
+                      </div>
+                    )}
+                    {item.application_context.has_metrics && (
+                      <div className="flex items-center gap-2 text-purple-800">
+                        <TrendingUp className="w-4 h-4 text-purple-600" />
+                        Results/Metrics Included
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Source Link */}
               <a
                 href={item.source_url}
@@ -135,13 +224,30 @@ export default function GalleryDetailModal({ item, onClose }: GalleryDetailModal
                   <div className="mb-4">
                     <div className="text-sm text-gray-500 mb-1">Scene Type</div>
                     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-700">
-                      📍 {sceneInfo.label}
+                      {sceneInfo.label}
                     </span>
                   </div>
                 )}
 
-                {/* Task Types */}
-                {item.task_types.length > 0 && (
+                {/* Specific Tasks (V2) */}
+                {item.specific_tasks && item.specific_tasks.length > 0 && (
+                  <div className="mb-4">
+                    <div className="text-sm text-gray-500 mb-1">Specific Tasks</div>
+                    <div className="flex flex-wrap gap-1">
+                      {item.specific_tasks.map((task) => (
+                        <span
+                          key={task}
+                          className="px-2 py-1 bg-indigo-100 text-indigo-700 text-sm rounded"
+                        >
+                          {task.replace(/_/g, ' ')}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Task Types (fallback) */}
+                {(!item.specific_tasks || item.specific_tasks.length === 0) && item.task_types && item.task_types.length > 0 && (
                   <div className="mb-4">
                     <div className="text-sm text-gray-500 mb-1">Tasks Demonstrated</div>
                     <div className="flex flex-wrap gap-1">
@@ -158,7 +264,7 @@ export default function GalleryDetailModal({ item, onClose }: GalleryDetailModal
                 )}
 
                 {/* Functional Requirements */}
-                {item.functional_requirements.length > 0 && (
+                {item.functional_requirements && item.functional_requirements.length > 0 && (
                   <div className="mb-4">
                     <div className="text-sm text-gray-500 mb-1">Functional Requirements</div>
                     <div className="flex flex-wrap gap-1">
@@ -179,7 +285,7 @@ export default function GalleryDetailModal({ item, onClose }: GalleryDetailModal
                   <div>
                     <div className="text-sm text-gray-500 mb-1">Environment</div>
                     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700">
-                      🏠 {item.environment_setting}
+                      {item.environment_setting}
                     </span>
                   </div>
                 )}
@@ -195,13 +301,13 @@ export default function GalleryDetailModal({ item, onClose }: GalleryDetailModal
                     <span>1.</span>
                     <span>Select "{categoryInfo.label}" category</span>
                   </li>
-                  {item.task_types[0] && (
+                  {(item.specific_tasks?.[0] || item.task_types?.[0]) && (
                     <li className="flex items-start gap-2">
                       <span>2.</span>
-                      <span>Choose "{item.task_types[0].replace(/_/g, ' ')}" task</span>
+                      <span>Choose "{(item.specific_tasks?.[0] || item.task_types?.[0]).replace(/_/g, ' ')}" task</span>
                     </li>
                   )}
-                  {item.functional_requirements[0] && (
+                  {item.functional_requirements?.[0] && (
                     <li className="flex items-start gap-2">
                       <span>3.</span>
                       <span>Enable "{item.functional_requirements[0].replace(/_/g, ' ')}"</span>
