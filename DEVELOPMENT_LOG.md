@@ -485,12 +485,91 @@ frontend/src/
 
 ---
 
+## Session 4: 2026-02-01 - Classification System V2 Implementation
+
+### Problem Statement
+
+Many gallery items showed basic robot capabilities (walking, demos) rather than real-world applications. Users need to find actual deployment examples to understand configurations, not marketing demos.
+
+### Solution: V2 Classification System
+
+Implemented enhanced classification to distinguish real applications from demos.
+
+### New Classification Dimensions
+
+#### 1. Content Type (Primary Filter)
+| Type | Description |
+|------|-------------|
+| `real_application` | Deployed in actual business operations |
+| `pilot_poc` | Trial deployment, proof of concept |
+| `case_study` | Documented with results/metrics |
+| `tech_demo` | Capability demo, trade show, lab |
+| `product_announcement` | New product reveal |
+| `tutorial` | How-to content |
+
+#### 2. Educational Value (1-5 Stars)
+- 5 = Full case study with metrics
+- 4 = Real deployment with details
+- 3 = Real application, limited context
+- 2 = Demo with some relevance
+- 1 = Pure marketing
+
+#### 3. Specific Tasks
+Refined from broad types (e.g., `transportation` → `pallet_transport`, `tote_transport`, `cart_towing`)
+
+#### 4. Application Context
+- `problem_solved`: labor_shortage, safety_hazard, quality_consistency
+- `deployment_scale`: single_unit → multi_site
+- `customer_identified`: boolean
+- `has_metrics`: boolean
+
+### Files Modified/Created
+
+| File | Change |
+|------|--------|
+| `crawler/src/processors/ai_classifier.py` | V2 classifier with stricter content type detection |
+| `crawler/src/storage/supabase_client.py` | V2 fields support in insert/update |
+| `crawler/src/reclassify_existing.py` | Script to re-classify 487 existing items |
+| `frontend/src/types/gallery.ts` | V2 types, display info, helpers |
+| `frontend/src/services/gallery-service.ts` | V2 filters, quality sorting |
+| `supabase/migrations/086_classification_v2.sql` | New columns, indexes, functions |
+| `docs/CLASSIFICATION_SYSTEM_V2.md` | Full design documentation |
+
+### Database Changes (Migration 086)
+
+New columns:
+- `content_type` VARCHAR(50)
+- `deployment_maturity` VARCHAR(50)
+- `educational_value` INTEGER (1-5)
+- `specific_tasks` TEXT[]
+- `application_context` JSONB
+
+New indexes and functions for efficient filtering.
+
+### Frontend Changes
+
+- Default filter: Only show `real_application`, `case_study`, `pilot_poc` with `educational_value >= 3`
+- "Include demos" toggle to show all content
+- New sort option: "Quality" (by educational value)
+- Content type badges on cards
+- Star ratings for educational value
+
+### Next Steps
+
+1. [ ] Apply migration 086 to Supabase
+2. [ ] Run re-classification script: `python src/reclassify_existing.py`
+3. [ ] Update frontend UI components to display new badges
+4. [ ] Test filtering behavior
+
+---
+
 ## Lessons Learned
 
 1. **Application-centric design** is more valuable than robot-centric for user education
 2. **RSIP taxonomy alignment** ensures consistency across platforms
 3. **Migration numbering** must be coordinated across RSIP project folders
 4. **Multi-source content** (not just YouTube) provides better coverage
+5. **Content type classification** is essential to separate demos from real deployments
 
 ---
 
