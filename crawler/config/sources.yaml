@@ -1,0 +1,541 @@
+# RSIP Application Gallery - Content Sources Configuration
+# Organized by application category for RSIP alignment
+#
+# PHASED APPROACH:
+#   Phase 1: YouTube channels (verify pipeline)
+#   Phase 2: Google Search for news + images (broader coverage)
+
+# =============================================================================
+# PHASE 1: YOUTUBE SOURCES
+# =============================================================================
+
+youtube:
+  # -------------------------------------------------------------------------
+  # Robot Manufacturers (Official Channels)
+  # -------------------------------------------------------------------------
+  channels:
+    # Industrial Arms & Automation
+    - id: "UC7vVhkEfw4nOGp8TyDk7RcQ"
+      name: "Boston Dynamics"
+      default_category: "industrial_automation"
+      priority: 1
+
+    - id: "UCqGn1f0O7c4qAFbWjNxNS3A"
+      name: "Universal Robots"
+      default_category: "industrial_automation"
+      priority: 1
+
+    - id: "UCKuMrA1rMbHzMUqYwJNpKjA"
+      name: "KUKA Robotics"
+      default_category: "industrial_automation"
+      priority: 1
+
+    - id: "UCKBDWtJBRdVsLpVqJvGJl5g"
+      name: "ABB Robotics"
+      default_category: "industrial_automation"
+      priority: 1
+
+    - id: "UCx8rZl5Qo6BqNmJmRz1qW-w"
+      name: "FANUC America"
+      default_category: "industrial_automation"
+      priority: 1
+
+    - id: "UCRmAuo5vLgIjrVn4PcWzdkg"
+      name: "Yaskawa Motoman"
+      default_category: "industrial_automation"
+      priority: 1
+
+    - id: "UCn6Jc4LoNaZl4jH2t9fJHbQ"
+      name: "Epson Robots"
+      default_category: "industrial_automation"
+      priority: 2
+
+    - id: "UCvOu1rQr3Y5V1txyBG3kU0w"
+      name: "Doosan Robotics"
+      default_category: "industrial_automation"
+      priority: 2
+
+    # Mobile Robots & AMR
+    - id: "UCN-StetwWuVYf-MU2_NVj4A"
+      name: "Agility Robotics"
+      default_category: "service_robotics"
+      priority: 1
+
+    - id: "UCFlG8JVvCVfhd7SM_gz-YIg"
+      name: "Locus Robotics"
+      default_category: "industrial_automation"
+      priority: 1
+
+    - id: "UCWcg2CPMjg3VfNGt7qLDG9Q"
+      name: "6 River Systems"
+      default_category: "industrial_automation"
+      priority: 2
+
+    - id: "UCvHpQNqB0AFDL9xL95wSePQ"
+      name: "MiR - Mobile Industrial Robots"
+      default_category: "industrial_automation"
+      priority: 1
+
+    - id: "UC4lTMWJH0C5xBGwTB0qeWGw"
+      name: "Fetch Robotics"
+      default_category: "industrial_automation"
+      priority: 2
+
+    - id: "UCYkOJE6e0YMB7EKMT8e0DNQ"
+      name: "OTTO Motors"
+      default_category: "industrial_automation"
+      priority: 2
+
+    # Service & Hospitality Robots
+    - id: "UCc3dBExVfebL2OKZA9Z7DPA"
+      name: "Bear Robotics"
+      default_category: "service_robotics"
+      priority: 1
+
+    - id: "UCgOJMqLMF2rlQkL3kNr2Hlg"
+      name: "Pudu Robotics"
+      default_category: "service_robotics"
+      priority: 1
+
+    - id: "UCQy9i2zJL5AZxDgtLm7lNTQ"
+      name: "Savioke"
+      default_category: "service_robotics"
+      priority: 2
+
+    - id: "UCPgNQ6bHg7FZQdwl0EZZS8A"
+      name: "Keenon Robotics"
+      default_category: "service_robotics"
+      priority: 2
+
+    # Healthcare & Medical
+    - id: "UCMpx-nQrNjT3O9Yrv8L1u6g"
+      name: "Intuitive Surgical"
+      default_category: "service_robotics"
+      priority: 1
+
+    - id: "UCY7x0hCXPn4wKjVYAVKxnNA"
+      name: "Aethon (ST Engineering)"
+      default_category: "service_robotics"
+      priority: 2
+
+    # Security & Inspection
+    - id: "UCkRpGbDCpOQxLm0FHSGHe0g"
+      name: "Knightscope"
+      default_category: "surveillance_security"
+      priority: 1
+
+    - id: "UCT9w8FLYbmI8hEnX1gTWGIA"
+      name: "ANYbotics"
+      default_category: "surveillance_security"
+      priority: 1
+
+    # Research Labs & Universities
+    - id: "UCsAb8mkFLLhlZNqJEaDjMdQ"
+      name: "MIT CSAIL"
+      default_category: "industrial_automation"
+      priority: 2
+
+    - id: "UCQ6UJOEJHxT3Mk0GbRPcrpA"
+      name: "Stanford Robotics"
+      default_category: "industrial_automation"
+      priority: 2
+
+    - id: "UCyks68O3S1nqb4jL5-xTxOg"
+      name: "CMU Robotics Institute"
+      default_category: "industrial_automation"
+      priority: 2
+
+    # Trade Shows & Industry News
+    - id: "UCMhCnKpLM0BQ5gAYzL3k6Ew"
+      name: "Automate Show"
+      default_category: "industrial_automation"
+      priority: 2
+
+    - id: "UCbD1K9yCwm2j0V4qIB6Q3wQ"
+      name: "RoboBusiness"
+      default_category: "industrial_automation"
+      priority: 2
+
+  # -------------------------------------------------------------------------
+  # YouTube Search Queries (Broader Coverage)
+  # -------------------------------------------------------------------------
+  search_queries:
+    industrial_automation:
+      # Warehouse & Logistics
+      - query: "warehouse robot automation real application"
+        tasks: ["transportation"]
+      - query: "AGV automated guided vehicle factory"
+        tasks: ["transportation"]
+      - query: "AMR autonomous mobile robot warehouse"
+        tasks: ["transportation"]
+      - query: "goods to person robot fulfillment"
+        tasks: ["transportation"]
+      - query: "forklift robot autonomous"
+        tasks: ["transportation"]
+
+      # Assembly & Manufacturing
+      - query: "industrial robot arm assembly line real"
+        tasks: ["manipulation", "assembly"]
+      - query: "cobot collaborative robot manufacturing"
+        tasks: ["manipulation", "assembly"]
+      - query: "robot cell automation production"
+        tasks: ["manipulation", "assembly"]
+      - query: "robotic assembly automotive"
+        tasks: ["manipulation", "assembly"]
+
+      # Palletizing & Packaging
+      - query: "robot palletizing system case study"
+        tasks: ["palletizing"]
+      - query: "robotic palletizer warehouse"
+        tasks: ["palletizing"]
+      - query: "depalletizing robot automation"
+        tasks: ["palletizing"]
+      - query: "packaging robot end of line"
+        tasks: ["packaging"]
+
+      # Inspection & Quality Control
+      - query: "quality inspection robot vision system"
+        tasks: ["inspection", "quality_control"]
+      - query: "robotic inspection industrial"
+        tasks: ["inspection"]
+      - query: "machine vision robot inspection"
+        tasks: ["inspection", "quality_control"]
+
+      # Welding & Fabrication
+      - query: "robot welding automation factory"
+        tasks: ["welding"]
+      - query: "robotic arc welding manufacturing"
+        tasks: ["welding"]
+      - query: "laser cutting robot industrial"
+        tasks: ["welding"]
+
+      # Bin Picking & Sorting
+      - query: "robot bin picking 3D vision"
+        tasks: ["manipulation"]
+      - query: "sorting robot automation"
+        tasks: ["manipulation"]
+      - query: "pick and place robot application"
+        tasks: ["manipulation"]
+
+    service_robotics:
+      # Hospital & Healthcare
+      - query: "hospital delivery robot real deployment"
+        tasks: ["delivery_service", "healthcare_assist"]
+      - query: "medical robot logistics hospital"
+        tasks: ["delivery_service", "healthcare_assist"]
+      - query: "pharmacy robot automation"
+        tasks: ["delivery_service", "healthcare_assist"]
+      - query: "surgical robot assistant"
+        tasks: ["healthcare_assist"]
+      - query: "disinfection robot hospital UV"
+        tasks: ["cleaning", "healthcare_assist"]
+
+      # Hotel & Hospitality
+      - query: "hotel service robot room delivery"
+        tasks: ["delivery_service", "human_interaction"]
+      - query: "hotel concierge robot"
+        tasks: ["human_interaction", "reception"]
+      - query: "luggage delivery robot hotel"
+        tasks: ["delivery_service"]
+
+      # Restaurant & Food Service
+      - query: "restaurant robot waiter server"
+        tasks: ["delivery_service"]
+      - query: "food delivery robot restaurant"
+        tasks: ["delivery_service"]
+      - query: "cafe robot barista"
+        tasks: ["delivery_service", "human_interaction"]
+
+      # Retail & Shopping
+      - query: "retail robot store assistant"
+        tasks: ["human_interaction"]
+      - query: "inventory robot retail store"
+        tasks: ["inspection"]
+      - query: "shopping mall robot guide"
+        tasks: ["human_interaction"]
+
+      # Cleaning & Maintenance
+      - query: "commercial cleaning robot floor scrubber"
+        tasks: ["cleaning"]
+      - query: "airport cleaning robot"
+        tasks: ["cleaning"]
+      - query: "autonomous cleaning robot commercial"
+        tasks: ["cleaning"]
+      - query: "window cleaning robot building"
+        tasks: ["cleaning"]
+
+      # Last-Mile Delivery
+      - query: "sidewalk delivery robot"
+        tasks: ["delivery_service"]
+      - query: "last mile delivery robot autonomous"
+        tasks: ["delivery_service"]
+      - query: "campus delivery robot university"
+        tasks: ["delivery_service"]
+
+    surveillance_security:
+      # Security Patrol
+      - query: "security patrol robot building"
+        tasks: ["perimeter_patrol"]
+      - query: "autonomous security robot campus"
+        tasks: ["perimeter_patrol"]
+      - query: "robot guard security"
+        tasks: ["perimeter_patrol", "threat_detection"]
+
+      # Industrial Inspection
+      - query: "inspection robot oil gas pipeline"
+        tasks: ["inspection"]
+      - query: "tank inspection robot"
+        tasks: ["inspection"]
+      - query: "power plant inspection robot"
+        tasks: ["inspection"]
+      - query: "infrastructure inspection robot drone"
+        tasks: ["inspection"]
+
+      # Facility Monitoring
+      - query: "data center robot monitoring"
+        tasks: ["inspection", "access_monitoring"]
+      - query: "warehouse surveillance robot autonomous"
+        tasks: ["perimeter_patrol"]
+
+# =============================================================================
+# PHASE 2: GOOGLE SEARCH SOURCES
+# =============================================================================
+
+google_search:
+  enabled: true
+
+  # Google Custom Search API configuration
+  # Requires: GOOGLE_CUSTOM_SEARCH_API_KEY and GOOGLE_CUSTOM_SEARCH_ENGINE_ID
+  api_settings:
+    results_per_query: 10
+    safe_search: "active"
+
+  # -------------------------------------------------------------------------
+  # News Search Queries
+  # -------------------------------------------------------------------------
+  news_queries:
+    industrial_automation:
+      - "warehouse automation robot deployment case study"
+      - "manufacturing robot installation factory"
+      - "logistics robot company warehouse"
+      - "cobot deployment manufacturing plant"
+      - "AMR autonomous mobile robot implementation"
+      - "robotic palletizer installation"
+      - "industrial robot arm factory case study"
+      - "automated warehouse system robot"
+
+    service_robotics:
+      - "hospital robot deployment healthcare"
+      - "hotel robot service implementation"
+      - "restaurant robot waiter deployment"
+      - "delivery robot last mile deployment"
+      - "retail robot store assistant"
+      - "cleaning robot commercial deployment"
+      - "airport robot service"
+      - "healthcare robot case study"
+
+    surveillance_security:
+      - "security robot patrol deployment"
+      - "inspection robot industrial plant"
+      - "autonomous robot surveillance"
+      - "robot security guard installation"
+
+  # -------------------------------------------------------------------------
+  # Image Search Queries
+  # -------------------------------------------------------------------------
+  image_queries:
+    industrial_automation:
+      - "warehouse robot AGV real deployment"
+      - "industrial robot arm factory floor"
+      - "collaborative robot manufacturing"
+      - "palletizing robot warehouse"
+      - "AMR autonomous mobile robot warehouse"
+      - "robotic welding cell"
+      - "robot assembly line automotive"
+      - "bin picking robot 3D vision"
+
+    service_robotics:
+      - "hospital delivery robot corridor"
+      - "hotel service robot lobby"
+      - "restaurant robot waiter serving"
+      - "cleaning robot commercial floor"
+      - "delivery robot sidewalk"
+      - "retail robot store"
+      - "reception robot hotel"
+      - "healthcare robot patient"
+
+    surveillance_security:
+      - "security patrol robot building"
+      - "inspection robot industrial facility"
+      - "autonomous robot data center"
+      - "robot security campus"
+
+# =============================================================================
+# NEWS RSS FEEDS (Expanded)
+# =============================================================================
+
+news_rss:
+  # Major Robotics Publications
+  - name: "The Robot Report"
+    url: "https://www.therobotreport.com/feed/"
+    priority: 1
+
+  - name: "IEEE Spectrum Robotics"
+    url: "https://spectrum.ieee.org/feeds/topic/robotics"
+    priority: 1
+
+  - name: "Robotics Business Review"
+    url: "https://www.roboticsbusinessreview.com/feed/"
+    priority: 1
+
+  - name: "Automation World"
+    url: "https://www.automationworld.com/rss.xml"
+    priority: 1
+
+  - name: "Robotics 24/7"
+    url: "https://www.robotics247.com/rss/rss.xml"
+    priority: 1
+
+  # Industry News
+  - name: "Modern Materials Handling"
+    url: "https://www.mmh.com/rss"
+    priority: 2
+
+  - name: "Supply Chain Dive"
+    url: "https://www.supplychaindive.com/feeds/news/"
+    priority: 2
+
+  - name: "Logistics Management"
+    url: "https://www.logisticsmgmt.com/rss"
+    priority: 2
+
+  - name: "Warehouse Automation"
+    url: "https://www.warehouseautomation.com/feed/"
+    priority: 2
+
+  # Healthcare & Service
+  - name: "Healthcare IT News"
+    url: "https://www.healthcareitnews.com/rss.xml"
+    priority: 2
+
+  - name: "Hotel Technology News"
+    url: "https://hoteltechnologynews.com/feed/"
+    priority: 3
+
+  # Tech News (filtered for robotics)
+  - name: "TechCrunch Robotics"
+    url: "https://techcrunch.com/tag/robotics/feed/"
+    priority: 2
+
+  - name: "VentureBeat AI"
+    url: "https://venturebeat.com/category/ai/feed/"
+    priority: 3
+
+# =============================================================================
+# COMPANY WEBSITES (Direct Crawling)
+# =============================================================================
+
+company_websites:
+  industrial_automation:
+    - name: "Boston Dynamics"
+      base_url: "https://bostondynamics.com"
+      paths: ["/solutions", "/resources/case-studies"]
+      priority: 1
+
+    - name: "Universal Robots"
+      base_url: "https://www.universal-robots.com"
+      paths: ["/case-stories"]
+      priority: 1
+
+    - name: "KUKA"
+      base_url: "https://www.kuka.com"
+      paths: ["/en-de/industries", "/en-de/customer-cases"]
+      priority: 1
+
+    - name: "ABB Robotics"
+      base_url: "https://new.abb.com"
+      paths: ["/products/robotics/case-studies"]
+      priority: 1
+
+    - name: "Locus Robotics"
+      base_url: "https://locusrobotics.com"
+      paths: ["/resources/case-studies"]
+      priority: 1
+
+    - name: "6 River Systems"
+      base_url: "https://6river.com"
+      paths: ["/resources/case-studies"]
+      priority: 2
+
+    - name: "MiR"
+      base_url: "https://www.mobile-industrial-robots.com"
+      paths: ["/case-studies"]
+      priority: 1
+
+    - name: "OTTO Motors"
+      base_url: "https://ottomotors.com"
+      paths: ["/resources/case-studies"]
+      priority: 2
+
+  service_robotics:
+    - name: "Bear Robotics"
+      base_url: "https://www.bearrobotics.ai"
+      paths: ["/case-studies", "/customers"]
+      priority: 1
+
+    - name: "Pudu Robotics"
+      base_url: "https://www.pudurobotics.com"
+      paths: ["/case"]
+      priority: 1
+
+    - name: "Savioke"
+      base_url: "https://www.savioke.com"
+      paths: ["/customers"]
+      priority: 2
+
+    - name: "Aethon"
+      base_url: "https://aethon.com"
+      paths: ["/case-studies"]
+      priority: 1
+
+    - name: "Starship Technologies"
+      base_url: "https://www.starship.xyz"
+      paths: ["/business"]
+      priority: 2
+
+  surveillance_security:
+    - name: "Knightscope"
+      base_url: "https://www.knightscope.com"
+      paths: ["/case-studies"]
+      priority: 1
+
+    - name: "ANYbotics"
+      base_url: "https://www.anybotics.com"
+      paths: ["/applications", "/case-studies"]
+      priority: 1
+
+    - name: "Spot by Boston Dynamics"
+      base_url: "https://bostondynamics.com"
+      paths: ["/solutions/inspection"]
+      priority: 1
+
+# =============================================================================
+# RATE LIMITING & CRAWLER SETTINGS
+# =============================================================================
+
+rate_limits:
+  youtube_api_daily_quota: 10000
+  google_search_daily_quota: 100  # Free tier
+  requests_per_second: 1.0
+  retry_delay_seconds: 5
+  max_retries: 3
+
+crawler:
+  max_results_per_source: 50
+  max_results_per_query: 20
+  min_relevance_score: 0.6
+  video_min_duration: 30       # seconds
+  video_max_duration: 1800     # 30 minutes
+  published_within_days: 365   # Only content from last year
+  image_min_width: 400         # Minimum image width in pixels
+  image_min_height: 300        # Minimum image height in pixels
