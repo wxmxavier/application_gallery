@@ -556,7 +556,7 @@ New indexes and functions for efficient filtering.
 
 ### Next Steps
 
-1. [ ] Apply migration 086 to Supabase
+1. [x] Apply migration 086 to Supabase ✅ (2026-02-02)
 2. [ ] Run re-classification script: `python src/reclassify_existing.py`
 3. [ ] Update frontend UI components to display new badges
 4. [ ] Test filtering behavior
@@ -574,4 +574,4 @@ New indexes and functions for efficient filtering.
 ---
 
 *Log maintained by development team*
-*Last updated: 2026-02-01*
+*Last updated: 2026-02-02*
