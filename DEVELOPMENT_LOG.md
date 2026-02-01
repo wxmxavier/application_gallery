@@ -580,10 +580,23 @@ New indexes and functions for efficient filtering.
 
 ### Remaining Tasks
 
-1. [ ] Update frontend UI components to display content type badges
-2. [ ] Add star rating display for educational value
+1. [x] Update frontend UI components to display content type badges ✅ (2026-02-02)
+2. [x] Add star rating display for educational value ✅ (2026-02-02)
 3. [ ] Test filtering behavior with new default filters
 4. [ ] Verify "Include demos" toggle works correctly
+
+### Frontend UI Updates (2026-02-02)
+
+**GalleryCard.tsx:**
+- Content type badge (top-left): Shows Real Application, Tech Demo, Case Study, etc.
+- Educational value stars (top-right): Displays for items with 3+ stars
+- Shows specific_tasks when available, falls back to task_types
+
+**GalleryDetailModal.tsx:**
+- Header badges: Content type, educational value stars, deployment maturity
+- New "Application Context" section (purple): problem_solved, deployment_scale, customer_identified, has_metrics
+- Specific tasks display with indigo styling
+- Updated RSIP configuration hints to use specific tasks
 
 ---
 
