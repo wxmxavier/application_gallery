@@ -554,15 +554,36 @@ New indexes and functions for efficient filtering.
 - Content type badges on cards
 - Star ratings for educational value
 
-### Next Steps
+### Deployment Status
 
-1. [x] Apply migration 086 to Supabase ✅ (2026-02-02)
-2. [x] Run re-classification script ✅ (2026-02-02)
-   - 487 items processed, 0 errors
-   - Results: 73% real_application, 6% case_study, 10% tech_demo
-   - Quality content: 392 items (80.5%)
-3. [ ] Update frontend UI components to display new badges
-4. [ ] Test filtering behavior
+#### Migration 086 - Applied ✅ (2026-02-02)
+- Added columns: `content_type`, `deployment_maturity`, `educational_value`, `specific_tasks`, `application_context`
+- Created indexes for efficient filtering
+- Added helper functions: `get_gallery_content_stats()`, `search_gallery_v2()`
+
+#### Re-classification Results ✅ (2026-02-02)
+
+| Content Type | Count | Percentage |
+|--------------|-------|------------|
+| real_application | 357 | 73.3% |
+| case_study | 31 | 6.4% |
+| tech_demo | 51 | 10.5% |
+| product_announcement | 28 | 5.7% |
+| tutorial | 16 | 3.3% |
+| pilot_poc | 4 | 0.8% |
+
+**Summary:**
+- Total items processed: 487
+- Errors: 0
+- **Quality content (default view):** 392 items (80.5%)
+- Demo/Marketing content (hidden by default): 79 items (16.2%)
+
+### Remaining Tasks
+
+1. [ ] Update frontend UI components to display content type badges
+2. [ ] Add star rating display for educational value
+3. [ ] Test filtering behavior with new default filters
+4. [ ] Verify "Include demos" toggle works correctly
 
 ---
 
