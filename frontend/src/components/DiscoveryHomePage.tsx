@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Search, X, Factory, Bot, Shield, ChevronRight, Play, Image, FileText, ArrowUpDown, Clock, TrendingUp, Calendar } from 'lucide-react';
-import type { GalleryItem, GalleryFilters, ApplicationCategory, MediaType } from '../types/gallery';
-import { CATEGORY_INFO } from '../types/gallery';
+import { Search, X, Factory, Bot, Shield, ChevronRight, Play, FileText, ArrowUpDown, Clock, TrendingUp, Calendar, Eye, ExternalLink, ToggleLeft, ToggleRight } from 'lucide-react';
+import type { GalleryItem, GalleryFilters, ApplicationCategory } from '../types/gallery';
+import { CATEGORY_INFO, CONTENT_TYPE_INFO, EDUCATIONAL_VALUE_INFO } from '../types/gallery';
 import { getGalleryItems, getFeaturedItems, SortOption } from '../services/gallery-service';
 import HeroCarousel from './discovery/HeroCarousel';
 import MasonryGrid from './discovery/MasonryGrid';
@@ -13,20 +13,16 @@ interface DiscoveryHomePageProps {
   onFiltersChange?: (filters: GalleryFilters) => void;
 }
 
+type ViewMode = 'visual' | 'articles';
+
 const CATEGORIES: { id: ApplicationCategory; icon: typeof Factory; color: string }[] = [
   { id: 'industrial_automation', icon: Factory, color: 'bg-blue-500' },
   { id: 'service_robotics', icon: Bot, color: 'bg-green-500' },
   { id: 'surveillance_security', icon: Shield, color: 'bg-red-500' },
 ];
 
-const MEDIA_TYPES: { id: MediaType | 'all'; label: string; icon: typeof Play }[] = [
-  { id: 'all', label: 'All', icon: Factory },
-  { id: 'video', label: 'Videos', icon: Play },
-  { id: 'image', label: 'Images', icon: Image },
-  { id: 'article', label: 'Articles', icon: FileText },
-];
-
 const SORT_OPTIONS: { id: SortOption; label: string; icon: typeof Clock }[] = [
+  { id: 'quality', label: 'Best Quality', icon: TrendingUp },
   { id: 'recent', label: 'Most Recent', icon: Clock },
   { id: 'popular', label: 'Most Popular', icon: TrendingUp },
   { id: 'oldest', label: 'Oldest First', icon: Calendar },
@@ -34,71 +30,121 @@ const SORT_OPTIONS: { id: SortOption; label: string; icon: typeof Clock }[] = [
 
 export default function DiscoveryHomePage({
   initialFilters = {},
-  onFiltersChange,
+  onFiltersChange: _onFiltersChange,
 }: DiscoveryHomePageProps) {
   // State
   const [featuredItems, setFeaturedItems] = useState<GalleryItem[]>([]);
-  const [allItems, setAllItems] = useState<GalleryItem[]>([]);
+  const [visualItems, setVisualItems] = useState<GalleryItem[]>([]);
+  const [articleItems, setArticleItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
+  const [totalVisualCount, setTotalVisualCount] = useState(0);
+  const [totalArticleCount, setTotalArticleCount] = useState(0);
 
+  const [viewMode, setViewMode] = useState<ViewMode>('visual');
   const [activeCategory, setActiveCategory] = useState<ApplicationCategory | null>(
     initialFilters.category || null
   );
-  const [activeMediaType, setActiveMediaType] = useState<MediaType | 'all'>(
-    initialFilters.media_type || 'all'
-  );
-  const [sortBy, setSortBy] = useState<SortOption>('recent');
+  const [includeDemos, setIncludeDemos] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>('quality');
   const [searchQuery, setSearchQuery] = useState(initialFilters.search || '');
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
 
   // Build filters from state
-  const buildFilters = useCallback((): GalleryFilters => {
+  const buildFilters = useCallback((forArticles: boolean): GalleryFilters => {
     const filters: GalleryFilters = {};
     if (activeCategory) filters.category = activeCategory;
-    if (activeMediaType !== 'all') filters.media_type = activeMediaType;
     if (searchQuery) filters.search = searchQuery;
+
+    // Media type filter
+    if (forArticles) {
+      filters.media_type = 'article';
+    } else {
+      // For visual content, we'll filter client-side or use a custom approach
+    }
+
+    // Include demos toggle
+    if (includeDemos) {
+      filters.include_demos = true;
+    }
+
     return filters;
-  }, [activeCategory, activeMediaType, searchQuery]);
+  }, [activeCategory, searchQuery, includeDemos]);
 
   // Fetch featured items for hero carousel
   useEffect(() => {
     getFeaturedItems(5).then(setFeaturedItems);
   }, []);
 
-  // Fetch main gallery items
-  const fetchItems = useCallback(async (append = false) => {
-    const filters = buildFilters();
-    const offset = append ? allItems.length : 0;
+  // Fetch visual items (videos + images)
+  const fetchVisualItems = useCallback(async (append = false) => {
+    const filters = buildFilters(false);
+    const offset = append ? visualItems.length : 0;
+
+    if (!append) setLoading(true);
+    else setLoadingMore(true);
+
+    // Fetch videos
+    const videoFilters = { ...filters, media_type: 'video' as const };
+    const videoResponse = await getGalleryItems(videoFilters, 50, 0, sortBy);
+
+    // Fetch images
+    const imageFilters = { ...filters, media_type: 'image' as const };
+    const imageResponse = await getGalleryItems(imageFilters, 50, 0, sortBy);
+
+    // Combine and sort
+    const combined = [...videoResponse.data, ...imageResponse.data];
+    combined.sort((a, b) => {
+      if (sortBy === 'quality') {
+        return (b.educational_value || 0) - (a.educational_value || 0);
+      } else if (sortBy === 'recent') {
+        return new Date(b.published_at || 0).getTime() - new Date(a.published_at || 0).getTime();
+      } else if (sortBy === 'popular') {
+        return (b.view_count || 0) - (a.view_count || 0);
+      }
+      return new Date(a.published_at || 0).getTime() - new Date(b.published_at || 0).getTime();
+    });
 
     if (append) {
-      setLoadingMore(true);
+      setVisualItems(prev => [...prev, ...combined.slice(offset, offset + 24)]);
     } else {
-      setLoading(true);
+      setVisualItems(combined.slice(0, 24));
     }
 
-    const response = await getGalleryItems(filters, 24, offset, sortBy);
-
-    if (append) {
-      setAllItems((prev) => [...prev, ...response.data]);
-    } else {
-      setAllItems(response.data);
-    }
-
-    setTotalCount(response.count);
+    setTotalVisualCount(videoResponse.count + imageResponse.count);
     setLoading(false);
     setLoadingMore(false);
+  }, [buildFilters, visualItems.length, sortBy]);
 
-    if (onFiltersChange) {
-      onFiltersChange(filters);
+  // Fetch article items
+  const fetchArticleItems = useCallback(async (append = false) => {
+    const filters = buildFilters(true);
+    const offset = append ? articleItems.length : 0;
+
+    if (!append) setLoading(true);
+    else setLoadingMore(true);
+
+    const response = await getGalleryItems(filters, 20, offset, sortBy);
+
+    if (append) {
+      setArticleItems(prev => [...prev, ...response.data]);
+    } else {
+      setArticleItems(response.data);
     }
-  }, [buildFilters, allItems.length, onFiltersChange, sortBy]);
+
+    setTotalArticleCount(response.count);
+    setLoading(false);
+    setLoadingMore(false);
+  }, [buildFilters, articleItems.length, sortBy]);
 
   // Refetch when filters change
   useEffect(() => {
-    fetchItems(false);
-  }, [activeCategory, activeMediaType, searchQuery, sortBy]);
+    if (viewMode === 'visual') {
+      fetchVisualItems(false);
+    } else {
+      fetchArticleItems(false);
+    }
+  }, [activeCategory, searchQuery, sortBy, includeDemos, viewMode]);
 
   // Handle search
   const handleSearch = (e: React.FormEvent) => {
@@ -108,11 +154,81 @@ export default function DiscoveryHomePage({
   // Clear filters
   const clearFilters = () => {
     setActiveCategory(null);
-    setActiveMediaType('all');
     setSearchQuery('');
+    setIncludeDemos(false);
   };
 
-  const hasFilters = activeCategory !== null || activeMediaType !== 'all' || searchQuery.length > 0;
+  const hasFilters = activeCategory !== null || searchQuery.length > 0 || includeDemos;
+
+  // Article Card Component
+  const ArticleCard = ({ item }: { item: GalleryItem }) => {
+    const contentTypeInfo = item.content_type ? CONTENT_TYPE_INFO[item.content_type] : null;
+    const educationalInfo = item.educational_value ? EDUCATIONAL_VALUE_INFO[item.educational_value] : null;
+    const categoryInfo = CATEGORY_INFO[item.application_category];
+
+    return (
+      <div
+        onClick={() => setSelectedItem(item)}
+        className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer"
+      >
+        <div className="flex gap-4">
+          {/* Thumbnail */}
+          {item.thumbnail_url && (
+            <div className="flex-shrink-0 w-32 h-24 rounded-lg overflow-hidden bg-gray-100">
+              <img
+                src={item.thumbnail_url}
+                alt={item.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            {/* Badges */}
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              {contentTypeInfo && (
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded border ${contentTypeInfo.color}`}>
+                  {contentTypeInfo.icon} {contentTypeInfo.label}
+                </span>
+              )}
+              {educationalInfo && item.educational_value >= 3 && (
+                <span className="text-xs text-yellow-600">{educationalInfo.stars}</span>
+              )}
+              <span className={`px-2 py-0.5 rounded text-xs ${categoryInfo.color}`}>
+                {categoryInfo.icon} {categoryInfo.label}
+              </span>
+            </div>
+
+            {/* Title */}
+            <h3 className="font-semibold text-gray-900 line-clamp-2 mb-1 group-hover:text-blue-600">
+              {item.title}
+            </h3>
+
+            {/* Summary */}
+            {item.ai_summary && (
+              <p className="text-sm text-gray-600 line-clamp-2 mb-2">{item.ai_summary}</p>
+            )}
+
+            {/* Meta */}
+            <div className="flex items-center gap-3 text-xs text-gray-500">
+              <span className="flex items-center gap-1">
+                <ExternalLink className="w-3 h-3" />
+                {item.source_name}
+              </span>
+              {item.published_at && (
+                <span>{new Date(item.published_at).toLocaleDateString()}</span>
+              )}
+              <span className="flex items-center gap-1">
+                <Eye className="w-3 h-3" />
+                {item.view_count}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -168,8 +284,8 @@ export default function DiscoveryHomePage({
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Hero Carousel - only show when no filters */}
-        {!hasFilters && featuredItems.length > 0 && (
+        {/* Hero Carousel - only show when no filters and on visual mode */}
+        {!hasFilters && viewMode === 'visual' && featuredItems.length > 0 && (
           <section className="mb-8">
             <HeroCarousel
               items={featuredItems}
@@ -178,30 +294,58 @@ export default function DiscoveryHomePage({
           </section>
         )}
 
-        {/* Filter Tabs */}
-        <section className="mb-6 space-y-4">
-          {/* Media Type Tabs */}
-          <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-lg w-fit">
-            {MEDIA_TYPES.map(({ id, label, icon: Icon }) => {
-              const isActive = activeMediaType === id;
-              return (
-                <button
-                  key={id}
-                  onClick={() => setActiveMediaType(id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  {id !== 'all' && <Icon className="w-4 h-4" />}
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+        {/* View Mode Tabs */}
+        <section className="mb-6">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            {/* Visual / Articles Tabs */}
+            <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-lg">
+              <button
+                onClick={() => setViewMode('visual')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                  viewMode === 'visual'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Play className="w-4 h-4" />
+                Visual Content
+                <span className="text-xs text-gray-400 ml-1">({totalVisualCount})</span>
+              </button>
+              <button
+                onClick={() => setViewMode('articles')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                  viewMode === 'articles'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <FileText className="w-4 h-4" />
+                Articles
+                <span className="text-xs text-gray-400 ml-1">({totalArticleCount})</span>
+              </button>
+            </div>
 
-          {/* Category Tabs */}
+            {/* Include Demos Toggle */}
+            <button
+              onClick={() => setIncludeDemos(!includeDemos)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all border ${
+                includeDemos
+                  ? 'bg-orange-50 border-orange-200 text-orange-700'
+                  : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+              }`}
+            >
+              {includeDemos ? (
+                <ToggleRight className="w-5 h-5 text-orange-500" />
+              ) : (
+                <ToggleLeft className="w-5 h-5" />
+              )}
+              Include Tech Demos
+            </button>
+          </div>
+        </section>
+
+        {/* Category Filters */}
+        <section className="mb-6">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-gray-500 mr-2">Category:</span>
             <button
@@ -248,10 +392,15 @@ export default function DiscoveryHomePage({
         {/* Results Header */}
         <section className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">
-            {hasFilters ? 'Search Results' : 'Browse Applications'}
+            {viewMode === 'visual' ? 'Videos & Images' : 'Articles & Case Studies'}
             <span className="ml-2 text-sm font-normal text-gray-500">
-              {loading ? '' : `(${totalCount})`}
+              {loading ? '' : `(${viewMode === 'visual' ? totalVisualCount : totalArticleCount})`}
             </span>
+            {includeDemos && (
+              <span className="ml-2 px-2 py-0.5 text-xs bg-orange-100 text-orange-700 rounded">
+                Including demos
+              </span>
+            )}
           </h2>
 
           {/* Sort Dropdown */}
@@ -269,13 +418,16 @@ export default function DiscoveryHomePage({
           </div>
         </section>
 
-        {/* Gallery Grid */}
+        {/* Content Grid */}
         <section>
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <div className={viewMode === 'visual'
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
+              : "space-y-4"
+            }>
               {[...Array(8)].map((_, i) => (
                 <div key={i} className="bg-white rounded-xl overflow-hidden border border-gray-100">
-                  <div className="aspect-video bg-gray-100 animate-pulse" />
+                  <div className={viewMode === 'visual' ? "aspect-video bg-gray-100 animate-pulse" : "h-24 bg-gray-100 animate-pulse"} />
                   <div className="p-4 space-y-3">
                     <div className="h-4 bg-gray-100 rounded animate-pulse" />
                     <div className="h-3 bg-gray-100 rounded w-2/3 animate-pulse" />
@@ -283,14 +435,41 @@ export default function DiscoveryHomePage({
                 </div>
               ))}
             </div>
-          ) : (
+          ) : viewMode === 'visual' ? (
             <MasonryGrid
-              items={allItems}
+              items={visualItems}
               onItemClick={setSelectedItem}
-              onLoadMore={() => fetchItems(true)}
-              hasMore={allItems.length < totalCount}
+              onLoadMore={() => fetchVisualItems(true)}
+              hasMore={visualItems.length < totalVisualCount}
               loading={loadingMore}
             />
+          ) : (
+            <div className="space-y-4">
+              {articleItems.map((item) => (
+                <ArticleCard key={item.id} item={item} />
+              ))}
+
+              {/* Load More */}
+              {articleItems.length < totalArticleCount && (
+                <div className="text-center pt-4">
+                  <button
+                    onClick={() => fetchArticleItems(true)}
+                    disabled={loadingMore}
+                    className="px-6 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  >
+                    {loadingMore ? 'Loading...' : 'Load More Articles'}
+                  </button>
+                </div>
+              )}
+
+              {/* Empty State */}
+              {articleItems.length === 0 && !loading && (
+                <div className="text-center py-12">
+                  <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">No articles found</p>
+                </div>
+              )}
+            </div>
           )}
         </section>
       </main>
@@ -299,7 +478,7 @@ export default function DiscoveryHomePage({
       <footer className="bg-white border-t border-gray-200 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-            <span>{totalCount} robotics applications • Updated daily</span>
+            <span>{totalVisualCount + totalArticleCount} robotics applications • Updated daily</span>
             <div className="flex items-center gap-4">
               <a href="https://rsip-platform.com" className="hover:text-gray-700">RSIP Platform</a>
               <span>•</span>
@@ -313,7 +492,7 @@ export default function DiscoveryHomePage({
       {selectedItem && (
         <LightboxViewer
           item={selectedItem}
-          items={allItems}
+          items={viewMode === 'visual' ? visualItems : articleItems}
           onClose={() => setSelectedItem(null)}
           onNavigate={setSelectedItem}
         />

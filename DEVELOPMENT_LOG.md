@@ -582,8 +582,11 @@ New indexes and functions for efficient filtering.
 
 1. [x] Update frontend UI components to display content type badges ✅ (2026-02-02)
 2. [x] Add star rating display for educational value ✅ (2026-02-02)
-3. [ ] Test filtering behavior with new default filters
-4. [ ] Verify "Include demos" toggle works correctly
+3. [x] Separate articles from visual content (tabs) ✅ (2026-02-02)
+4. [x] Add "Include Tech Demos" toggle ✅ (2026-02-02)
+5. [ ] User authentication (SSO with RSIP)
+6. [ ] Admin moderation interface
+7. [ ] Deploy to production
 
 ### Frontend UI Updates (2026-02-02)
 
@@ -597,6 +600,43 @@ New indexes and functions for efficient filtering.
 - New "Application Context" section (purple): problem_solved, deployment_scale, customer_identified, has_metrics
 - Specific tasks display with indigo styling
 - Updated RSIP configuration hints to use specific tasks
+
+### Content Layout Separation (2026-02-02)
+
+**Problem:** Articles mixed with videos/images in Pinterest-style masonry grid didn't fit visually - articles need list-style layout.
+
+**Solution:** Separated content into tabs with different layouts.
+
+**DiscoveryHomePage.tsx Updates:**
+
+1. **View Mode Tabs**
+   - "Visual Content" tab: Videos and images in masonry grid layout
+   - "Articles" tab: Articles in list-style layout with thumbnails
+   - Count badges on each tab
+
+2. **Include Tech Demos Toggle**
+   - Orange toggle button to show/hide tech_demo content
+   - By default, only quality content (real_application, case_study, pilot_poc with educational_value >= 3) is shown
+   - When enabled, includes tech_demo and product_announcement content
+
+3. **ArticleCard Component**
+   - Horizontal list layout with thumbnail on left
+   - Content type and educational value badges
+   - AI summary display
+   - Source, date, and view count metadata
+
+**Content Distribution:**
+| Type | Count |
+|------|-------|
+| Videos | 123 |
+| Images | 194 |
+| Articles | 170 |
+| Tech Demos | 51 (50 videos, 1 article) |
+
+**UX Improvements:**
+- Articles no longer break the visual flow of the masonry grid
+- Tech demos can be explicitly included when users want to see capability demonstrations
+- Clear visual separation between visual content and text-based content
 
 ---
 
