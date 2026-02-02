@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Play, Image, FileText, Heart, Share2, ExternalLink } from 'lucide-react';
+import { Play, Heart, Share2, ExternalLink } from 'lucide-react';
 import type { GalleryItem } from '../../types/gallery';
 import { CATEGORY_INFO, SCENE_INFO, CONTENT_TYPE_INFO } from '../../types/gallery';
 
@@ -31,6 +31,16 @@ interface GridCardProps {
   onClick: () => void;
 }
 
+// Content type to border color mapping
+const CONTENT_TYPE_COLORS: Record<string, string> = {
+  real_application: 'border-l-green-500',
+  case_study: 'border-l-blue-500',
+  pilot_poc: 'border-l-purple-500',
+  tech_demo: 'border-l-orange-400',
+  product_announcement: 'border-l-pink-400',
+  tutorial: 'border-l-cyan-500',
+};
+
 function GridCard({ item, onClick }: GridCardProps) {
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -38,7 +48,7 @@ function GridCard({ item, onClick }: GridCardProps) {
   const sceneInfo = item.scene_type ? SCENE_INFO[item.scene_type] : null;
   const contentTypeInfo = item.content_type ? CONTENT_TYPE_INFO[item.content_type] : null;
 
-  const MediaIcon = item.media_type === 'video' ? Play : (item.media_type === 'image' || item.media_type === 'photo') ? Image : FileText;
+  const borderColor = item.content_type ? CONTENT_TYPE_COLORS[item.content_type] || 'border-l-gray-300' : 'border-l-gray-300';
 
   const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -54,9 +64,9 @@ function GridCard({ item, onClick }: GridCardProps) {
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 cursor-pointer border border-gray-100"
+      className={`bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 cursor-pointer border border-gray-100 border-l-4 ${borderColor}`}
     >
-      {/* Thumbnail */}
+      {/* Thumbnail - Clean design with minimal overlays */}
       <div className="relative aspect-video bg-gray-100 overflow-hidden">
         {item.thumbnail_url && !imageError ? (
           <img
@@ -75,8 +85,8 @@ function GridCard({ item, onClick }: GridCardProps) {
           </div>
         )}
 
-        {/* Hover Overlay */}
-        <div className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+        {/* Hover Overlay - Play button for videos */}
+        <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
           {item.media_type === 'video' && (
             <div className="w-14 h-14 rounded-full bg-white/95 flex items-center justify-center shadow-lg">
               <Play className="w-6 h-6 text-gray-900 ml-0.5" fill="currentColor" />
@@ -84,36 +94,23 @@ function GridCard({ item, onClick }: GridCardProps) {
           )}
         </div>
 
-        {/* Top badges */}
-        <div className="absolute top-2 left-2 right-2 flex justify-between items-start">
-          <div className="flex flex-col gap-1">
-            <span className="flex items-center gap-1 px-2 py-1 bg-white/95 backdrop-blur-sm text-xs font-medium rounded-md shadow-sm">
-              <MediaIcon className="w-3 h-3" />
-              {item.media_type === 'video' ? 'Video' : (item.media_type === 'image' || item.media_type === 'photo') ? 'Image' : 'Article'}
-            </span>
-            {/* Content Type Badge - especially visible for demos */}
-            {contentTypeInfo && (
-              <span className={`flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md shadow-sm border ${contentTypeInfo.color}`}>
-                {contentTypeInfo.icon} {contentTypeInfo.label}
-              </span>
-            )}
-          </div>
-
-          {item.featured && (
+        {/* Featured badge - only this on top */}
+        {item.featured && (
+          <div className="absolute top-2 right-2">
             <span className="px-2 py-1 bg-amber-400 text-amber-900 text-xs font-semibold rounded-md shadow-sm">
               Featured
             </span>
-          )}
-        </div>
+          </div>
+        )}
 
-        {/* Duration badge */}
+        {/* Duration badge - bottom right, small */}
         {item.duration_seconds && (
-          <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/80 text-white text-xs font-medium rounded">
+          <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/75 text-white text-xs font-medium rounded">
             {Math.floor(item.duration_seconds / 60)}:{(item.duration_seconds % 60).toString().padStart(2, '0')}
           </div>
         )}
 
-        {/* Quick actions on hover */}
+        {/* Quick actions on hover - bottom left */}
         <div className={`absolute bottom-2 left-2 flex gap-1 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
           <button
             onClick={(e) => { e.stopPropagation(); }}
@@ -133,44 +130,57 @@ function GridCard({ item, onClick }: GridCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-3">
+        {/* Content Type - subtle inline indicator */}
+        {contentTypeInfo && (
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <span className="text-xs text-gray-500">
+              {contentTypeInfo.icon} {contentTypeInfo.label}
+            </span>
+            {item.media_type === 'video' && <span className="text-xs text-gray-300">•</span>}
+            {item.media_type === 'video' && <span className="text-xs text-gray-400">Video</span>}
+            {(item.media_type === 'image' || item.media_type === 'photo') && <span className="text-xs text-gray-300">•</span>}
+            {(item.media_type === 'image' || item.media_type === 'photo') && <span className="text-xs text-gray-400">Image</span>}
+          </div>
+        )}
+
         {/* Title */}
         <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2 text-sm leading-snug">
           {item.title}
         </h3>
 
-        {/* Category & Scene Tags */}
-        <div className="flex flex-wrap gap-1.5 mb-3">
-          <span className={`px-2 py-0.5 text-xs font-medium rounded ${categoryInfo.color}`}>
+        {/* Category & Scene - compact pills */}
+        <div className="flex flex-wrap gap-1 mb-2">
+          <span className={`px-2 py-0.5 text-xs rounded ${categoryInfo.color}`}>
             {categoryInfo.label}
           </span>
           {sceneInfo && (
-            <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-600">
+            <span className="px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-600">
               {sceneInfo.label}
             </span>
           )}
         </div>
 
-        {/* Task Tags */}
+        {/* Task Tags - show only on hover or if few items */}
         {item.task_types.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-3">
+          <div className="flex flex-wrap gap-1 mb-2">
             {item.task_types.slice(0, 2).map((task) => (
               <span
                 key={task}
-                className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded"
+                className="px-1.5 py-0.5 text-xs bg-blue-50 text-blue-600 rounded"
               >
                 {task.replace(/_/g, ' ')}
               </span>
             ))}
             {item.task_types.length > 2 && (
-              <span className="px-2 py-0.5 text-xs bg-gray-50 text-gray-500 rounded">
+              <span className="px-1.5 py-0.5 text-xs bg-gray-50 text-gray-500 rounded">
                 +{item.task_types.length - 2}
               </span>
             )}
           </div>
         )}
 
-        {/* Source & Date - clickable link to original */}
+        {/* Source & Date - clickable link */}
         <a
           href={item.source_url}
           target="_blank"
@@ -178,7 +188,7 @@ function GridCard({ item, onClick }: GridCardProps) {
           onClick={(e) => e.stopPropagation()}
           className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-blue-600 transition-colors group"
         >
-          <ExternalLink className="w-3 h-3 flex-shrink-0 group-hover:text-blue-600" />
+          <ExternalLink className="w-3 h-3 flex-shrink-0" />
           <span className="truncate">{item.source_name}</span>
           {item.published_at && (
             <>
