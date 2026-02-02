@@ -76,21 +76,28 @@ export default function DiscoveryHomePage({
     getFeaturedItems(5).then(setFeaturedItems);
   }, []);
 
-  // Fetch visual items (videos + images)
+  // Fetch visual items (videos + images) - with proper pagination
   const fetchVisualItems = useCallback(async (append = false) => {
     const filters = buildFilters(false);
-    const offset = append ? visualItems.length : 0;
+    const currentCount = append ? visualItems.length : 0;
+    const batchSize = 24;
 
     if (!append) setLoading(true);
     else setLoadingMore(true);
 
-    // Fetch videos
-    const videoFilters = { ...filters, media_type: 'video' as const };
-    const videoResponse = await getGalleryItems(videoFilters, 50, 0, sortBy);
+    // Calculate how many of each to fetch based on current position
+    // Fetch more than needed to allow for proper sorting/mixing
+    const fetchLimit = batchSize + 12; // Fetch extra for sorting
 
-    // Fetch images
+    // Fetch videos with offset
+    const videoOffset = Math.floor(currentCount / 2);
+    const videoFilters = { ...filters, media_type: 'video' as const };
+    const videoResponse = await getGalleryItems(videoFilters, fetchLimit, videoOffset, sortBy);
+
+    // Fetch images with offset
+    const imageOffset = Math.floor(currentCount / 2);
     const imageFilters = { ...filters, media_type: 'image' as const };
-    const imageResponse = await getGalleryItems(imageFilters, 50, 0, sortBy);
+    const imageResponse = await getGalleryItems(imageFilters, fetchLimit, imageOffset, sortBy);
 
     // Combine and sort
     const combined = [...videoResponse.data, ...imageResponse.data];
@@ -105,10 +112,13 @@ export default function DiscoveryHomePage({
       return new Date(a.published_at || 0).getTime() - new Date(b.published_at || 0).getTime();
     });
 
+    // Take only what we need for this batch
+    const newItems = combined.slice(0, batchSize);
+
     if (append) {
-      setVisualItems(prev => [...prev, ...combined.slice(offset, offset + 24)]);
+      setVisualItems(prev => [...prev, ...newItems]);
     } else {
-      setVisualItems(combined.slice(0, 24));
+      setVisualItems(newItems);
     }
 
     setTotalVisualCount(videoResponse.count + imageResponse.count);

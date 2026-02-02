@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Play, Image, FileText, Heart, Share2, ExternalLink } from 'lucide-react';
 import type { GalleryItem } from '../../types/gallery';
-import { CATEGORY_INFO, SCENE_INFO } from '../../types/gallery';
+import { CATEGORY_INFO, SCENE_INFO, CONTENT_TYPE_INFO } from '../../types/gallery';
 
 // Format date as relative time (e.g., "2 days ago", "3 months ago")
 function formatRelativeDate(dateString: string): string {
@@ -36,6 +36,7 @@ function GridCard({ item, onClick }: GridCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const categoryInfo = CATEGORY_INFO[item.application_category];
   const sceneInfo = item.scene_type ? SCENE_INFO[item.scene_type] : null;
+  const contentTypeInfo = item.content_type ? CONTENT_TYPE_INFO[item.content_type] : null;
 
   const MediaIcon = item.media_type === 'video' ? Play : (item.media_type === 'image' || item.media_type === 'photo') ? Image : FileText;
 
@@ -85,10 +86,18 @@ function GridCard({ item, onClick }: GridCardProps) {
 
         {/* Top badges */}
         <div className="absolute top-2 left-2 right-2 flex justify-between items-start">
-          <span className="flex items-center gap-1 px-2 py-1 bg-white/95 backdrop-blur-sm text-xs font-medium rounded-md shadow-sm">
-            <MediaIcon className="w-3 h-3" />
-            {item.media_type === 'video' ? 'Video' : (item.media_type === 'image' || item.media_type === 'photo') ? 'Image' : 'Article'}
-          </span>
+          <div className="flex flex-col gap-1">
+            <span className="flex items-center gap-1 px-2 py-1 bg-white/95 backdrop-blur-sm text-xs font-medium rounded-md shadow-sm">
+              <MediaIcon className="w-3 h-3" />
+              {item.media_type === 'video' ? 'Video' : (item.media_type === 'image' || item.media_type === 'photo') ? 'Image' : 'Article'}
+            </span>
+            {/* Content Type Badge - especially visible for demos */}
+            {contentTypeInfo && (
+              <span className={`flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md shadow-sm border ${contentTypeInfo.color}`}>
+                {contentTypeInfo.icon} {contentTypeInfo.label}
+              </span>
+            )}
+          </div>
 
           {item.featured && (
             <span className="px-2 py-1 bg-amber-400 text-amber-900 text-xs font-semibold rounded-md shadow-sm">
