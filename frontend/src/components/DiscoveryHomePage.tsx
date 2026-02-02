@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Search, X, Factory, Bot, Shield, ChevronRight, Play, FileText, ArrowUpDown, Clock, TrendingUp, Calendar, Eye, ExternalLink, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Search, X, Factory, Bot, Shield, ChevronRight, Play, FileText, ArrowUpDown, Clock, TrendingUp, Calendar, Eye, ExternalLink, ToggleLeft, ToggleRight, MapPin, Wrench } from 'lucide-react';
 import type { GalleryItem, GalleryFilters, ApplicationCategory } from '../types/gallery';
-import { CATEGORY_INFO, CONTENT_TYPE_INFO, EDUCATIONAL_VALUE_INFO } from '../types/gallery';
+import { CATEGORY_INFO, CONTENT_TYPE_INFO, EDUCATIONAL_VALUE_INFO, SCENE_INFO } from '../types/gallery';
 import { getGalleryItems, getFeaturedItems, SortOption } from '../services/gallery-service';
 import HeroCarousel from './discovery/HeroCarousel';
 import MasonryGrid from './discovery/MasonryGrid';
@@ -19,6 +19,26 @@ const CATEGORIES: { id: ApplicationCategory; icon: typeof Factory; color: string
   { id: 'industrial_automation', icon: Factory, color: 'bg-blue-500' },
   { id: 'service_robotics', icon: Bot, color: 'bg-green-500' },
   { id: 'surveillance_security', icon: Shield, color: 'bg-red-500' },
+];
+
+// Top scene types for filtering
+const SCENE_TYPES = [
+  'warehouse', 'manufacturing', 'hospital', 'hotel', 'retail',
+  'outdoor', 'laboratory', 'office', 'restaurant', 'airport'
+];
+
+// Top task types for filtering
+const TASK_TYPES = [
+  { id: 'transportation', label: 'Transportation' },
+  { id: 'manipulation', label: 'Manipulation' },
+  { id: 'delivery_service', label: 'Delivery' },
+  { id: 'inspection', label: 'Inspection' },
+  { id: 'welding', label: 'Welding' },
+  { id: 'palletizing', label: 'Palletizing' },
+  { id: 'assembly', label: 'Assembly' },
+  { id: 'cleaning', label: 'Cleaning' },
+  { id: 'human_interaction', label: 'Human Interaction' },
+  { id: 'perimeter_patrol', label: 'Security Patrol' },
 ];
 
 const SORT_OPTIONS: { id: SortOption; label: string; icon: typeof Clock }[] = [
@@ -45,16 +65,21 @@ export default function DiscoveryHomePage({
   const [activeCategory, setActiveCategory] = useState<ApplicationCategory | null>(
     initialFilters.category || null
   );
+  const [activeSceneType, setActiveSceneType] = useState<string | null>(null);
+  const [activeTaskTypes, setActiveTaskTypes] = useState<string[]>([]);
   const [includeDemos, setIncludeDemos] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('quality');
   const [searchQuery, setSearchQuery] = useState(initialFilters.search || '');
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
+  const [showMoreFilters, setShowMoreFilters] = useState(false);
 
   // Build filters from state
   const buildFilters = useCallback((forArticles: boolean): GalleryFilters => {
     const filters: GalleryFilters = {};
     if (activeCategory) filters.category = activeCategory;
     if (searchQuery) filters.search = searchQuery;
+    if (activeSceneType) filters.scene_type = activeSceneType;
+    if (activeTaskTypes.length > 0) filters.task_types = activeTaskTypes;
 
     // Media type filter
     if (forArticles) {
@@ -69,7 +94,7 @@ export default function DiscoveryHomePage({
     }
 
     return filters;
-  }, [activeCategory, searchQuery, includeDemos]);
+  }, [activeCategory, searchQuery, includeDemos, activeSceneType, activeTaskTypes]);
 
   // Fetch featured items for hero carousel
   useEffect(() => {
@@ -154,7 +179,7 @@ export default function DiscoveryHomePage({
     } else {
       fetchArticleItems(false);
     }
-  }, [activeCategory, searchQuery, sortBy, includeDemos, viewMode]);
+  }, [activeCategory, searchQuery, sortBy, includeDemos, viewMode, activeSceneType, activeTaskTypes]);
 
   // Handle search
   const handleSearch = (e: React.FormEvent) => {
@@ -164,11 +189,22 @@ export default function DiscoveryHomePage({
   // Clear filters
   const clearFilters = () => {
     setActiveCategory(null);
+    setActiveSceneType(null);
+    setActiveTaskTypes([]);
     setSearchQuery('');
     setIncludeDemos(false);
   };
 
-  const hasFilters = activeCategory !== null || searchQuery.length > 0 || includeDemos;
+  // Toggle task type selection
+  const toggleTaskType = (taskId: string) => {
+    setActiveTaskTypes(prev =>
+      prev.includes(taskId)
+        ? prev.filter(t => t !== taskId)
+        : [...prev, taskId]
+    );
+  };
+
+  const hasFilters = activeCategory !== null || activeSceneType !== null || activeTaskTypes.length > 0 || searchQuery.length > 0 || includeDemos;
 
   // Article Card Component
   const ArticleCard = ({ item }: { item: GalleryItem }) => {
@@ -380,7 +416,7 @@ export default function DiscoveryHomePage({
         </section>
 
         {/* Category Filters */}
-        <section className="mb-6">
+        <section className="mb-4">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-gray-500 mr-2">Category:</span>
             <button
@@ -412,6 +448,24 @@ export default function DiscoveryHomePage({
               );
             })}
 
+            {/* More Filters Toggle */}
+            <button
+              onClick={() => setShowMoreFilters(!showMoreFilters)}
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                showMoreFilters || activeSceneType || activeTaskTypes.length > 0
+                  ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <Wrench className="w-3.5 h-3.5" />
+              More Filters
+              {(activeSceneType || activeTaskTypes.length > 0) && (
+                <span className="ml-1 px-1.5 py-0.5 bg-blue-600 text-white text-xs rounded-full">
+                  {(activeSceneType ? 1 : 0) + activeTaskTypes.length}
+                </span>
+              )}
+            </button>
+
             {/* Clear filters */}
             {hasFilters && (
               <button
@@ -423,6 +477,93 @@ export default function DiscoveryHomePage({
             )}
           </div>
         </section>
+
+        {/* Scene & Task Filters (expandable) */}
+        {showMoreFilters && (
+          <section className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            {/* Scene Type Filter */}
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <MapPin className="w-4 h-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Environment:</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {SCENE_TYPES.map((sceneId) => {
+                  const info = SCENE_INFO[sceneId];
+                  const isActive = activeSceneType === sceneId;
+                  return (
+                    <button
+                      key={sceneId}
+                      onClick={() => setActiveSceneType(isActive ? null : sceneId)}
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                        isActive
+                          ? 'bg-purple-500 text-white'
+                          : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      {info?.label || sceneId}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Task Type Filter */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Wrench className="w-4 h-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Task / Function:</span>
+                <span className="text-xs text-gray-400">(select multiple)</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {TASK_TYPES.map(({ id, label }) => {
+                  const isActive = activeTaskTypes.includes(id);
+                  return (
+                    <button
+                      key={id}
+                      onClick={() => toggleTaskType(id)}
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                        isActive
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Active Filters Display */}
+        {(activeSceneType || activeTaskTypes.length > 0) && !showMoreFilters && (
+          <section className="mb-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-gray-500">Active filters:</span>
+              {activeSceneType && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 text-sm rounded-full">
+                  {SCENE_INFO[activeSceneType]?.label || activeSceneType}
+                  <button onClick={() => setActiveSceneType(null)} className="hover:text-purple-900">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {activeTaskTypes.map(taskId => {
+                const task = TASK_TYPES.find(t => t.id === taskId);
+                return (
+                  <span key={taskId} className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">
+                    {task?.label || taskId}
+                    <button onClick={() => toggleTaskType(taskId)} className="hover:text-blue-900">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Results Header */}
         <section className="flex items-center justify-between mb-4">
