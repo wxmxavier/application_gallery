@@ -161,9 +161,15 @@ function GridCard({ item, onClick }: GridCardProps) {
           </div>
         )}
 
-        {/* Source & Date */}
-        <div className="flex items-center gap-1.5 text-xs text-gray-400">
-          <ExternalLink className="w-3 h-3 flex-shrink-0" />
+        {/* Source & Date - clickable link to original */}
+        <a
+          href={item.source_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-blue-600 transition-colors group"
+        >
+          <ExternalLink className="w-3 h-3 flex-shrink-0 group-hover:text-blue-600" />
           <span className="truncate">{item.source_name}</span>
           {item.published_at && (
             <>
@@ -171,7 +177,7 @@ function GridCard({ item, onClick }: GridCardProps) {
               <span className="flex-shrink-0">{formatRelativeDate(item.published_at)}</span>
             </>
           )}
-        </div>
+        </a>
       </div>
     </div>
   );

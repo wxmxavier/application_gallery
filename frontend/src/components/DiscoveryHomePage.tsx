@@ -205,6 +205,25 @@ export default function DiscoveryHomePage({
               {item.title}
             </h3>
 
+            {/* Task Labels */}
+            {(item.specific_tasks?.length > 0 || item.task_types?.length > 0) && (
+              <div className="flex flex-wrap gap-1 mb-2">
+                {(item.specific_tasks?.length > 0 ? item.specific_tasks : item.task_types).slice(0, 3).map((task) => (
+                  <span
+                    key={task}
+                    className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded"
+                  >
+                    {task.replace(/_/g, ' ')}
+                  </span>
+                ))}
+                {(item.specific_tasks?.length > 0 ? item.specific_tasks : item.task_types).length > 3 && (
+                  <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded">
+                    +{(item.specific_tasks?.length > 0 ? item.specific_tasks : item.task_types).length - 3}
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Summary */}
             {item.ai_summary && (
               <p className="text-sm text-gray-600 line-clamp-2 mb-2">{item.ai_summary}</p>
@@ -212,10 +231,16 @@ export default function DiscoveryHomePage({
 
             {/* Meta */}
             <div className="flex items-center gap-3 text-xs text-gray-500">
-              <span className="flex items-center gap-1">
+              <a
+                href={item.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1 hover:text-blue-600 transition-colors"
+              >
                 <ExternalLink className="w-3 h-3" />
                 {item.source_name}
-              </span>
+              </a>
               {item.published_at && (
                 <span>{new Date(item.published_at).toLocaleDateString()}</span>
               )}
