@@ -167,3 +167,181 @@ Video_Library/
 3. **Educational purpose** - Help users understand configuration options
 4. **Multi-source aggregation** - Company sites, news, YouTube, social media
 5. **Quality over quantity** - Moderation required before public display
+
+---
+
+## 🚨 MANDATORY DEVELOPMENT RULES
+
+### Database Migration Rules
+
+**⚠️ Agents DO NOT have permission to migrate database directly**
+
+1. **CREATE** migration SQL files in `supabase/migrations/` directory
+2. **DOCUMENT** the migration purpose and changes in the file header
+3. **INFORM** the user to apply the migration manually via Supabase dashboard
+4. **NEVER** attempt to run migrations directly via code or CLI
+
+**Migration File Naming Convention:**
+- Format: `XXX_description_of_change.sql` (e.g., `088_dmca_requests.sql`)
+- Increment the number sequentially from the last migration
+- Current highest: 088
+
+**UUID Casting in SQL:**
+```sql
+-- ❌ WRONG - Will cause "column is of type uuid but expression is of type text" error
+UPDATE table_name SET uuid_column = 'string-value';
+
+-- ✅ CORRECT - Always cast strings to UUID
+UPDATE table_name SET uuid_column = 'string-value'::uuid;
+```
+
+### Environment Variable Rules
+
+**MANDATORY**: Use a single `.env` file. Never use `.env.local` or other variants.
+
+```bash
+# Frontend variables MUST use VITE_ prefix
+VITE_SUPABASE_URL=https://...
+VITE_SUPABASE_ANON_KEY=...
+
+# Backend/scripts can use regular env vars
+SUPABASE_SERVICE_ROLE_KEY=...
+```
+
+**Critical Rule**: Never use `process.env` in frontend code - use `import.meta.env.VITE_*` instead.
+
+### Component Development Rules
+
+1. **Verify component usage** before modifying:
+   ```bash
+   grep -r "ComponentName" src/
+   grep -r "import.*ComponentName" src/
+   ```
+2. **Follow existing patterns** - Match the code style of neighboring files
+3. **Check database schema** before debugging - Compare database columns vs what code expects
+
+### Build & Testing Commands
+
+```bash
+npm run type-check              # TypeScript validation (run before commits)
+npm run build:vite-only         # Quick build without TypeScript check
+npm run build                   # Full production build
+npm run dev                     # Development server (port 5174)
+```
+
+**Debug builds** (preserves env vars):
+```bash
+npm run build:vite-only -- --mode development
+```
+
+### Troubleshooting
+
+**Blank page in browser:**
+- Check for `process.env` usage in client code (forbidden)
+- Fix: Use `import.meta.env.VITE_*` pattern instead
+
+**Database connection failed:**
+- Verify `.env` file has correct values
+- Check Supabase dashboard for service status
+
+**TypeScript errors blocking development:**
+```bash
+npm run build:vite-only  # Bypass TypeScript errors
+```
+
+---
+
+## Current Implementation Status
+
+### ✅ P0 - Completed (GDPR Compliance)
+| Task | Status |
+|------|--------|
+| Cookie Consent Management (CMP) | ✅ Done |
+| Privacy Policy page | ✅ Done |
+| Terms of Service page | ✅ Done |
+| Click-to-load for YouTube embeds | ✅ Done |
+| Consent gate on all embed components | ✅ Done |
+| DMCA/takedown request form | ✅ Done |
+
+### 🟠 P1 - After Launch (Pending)
+| Task | Status |
+|------|--------|
+| Proper TikTok embed player | ❌ TODO |
+| Proper LinkedIn embed/preview | ❌ TODO |
+| SerpAPI image copyright review | ❌ TODO |
+| Content moderation queue | ❌ TODO |
+| Content reporting feature | ❌ TODO |
+
+### 🟡 P2 - User Features (Pending)
+| Task | Status |
+|------|--------|
+| User authentication (SSO with RSIP) | ❌ TODO |
+| Favorites/collections | ❌ TODO |
+| View history | ❌ TODO |
+| Admin moderation dashboard | ❌ TODO |
+
+### 🟢 P3 - Future Enhancements (Pending)
+| Task | Status |
+|------|--------|
+| RSIP platform deep integration | ❌ TODO |
+| Multi-language support | ❌ TODO |
+| Analytics dashboard | ❌ TODO |
+
+---
+
+## Project Structure (Updated)
+
+```
+Video_Library/
+├── CLAUDE.md                           # This file
+├── DEVELOPMENT_LOG.md                  # Session-by-session development log
+├── EXPERT_ANALYSIS_REPORT.md           # Legal, architecture, PM, UI analysis
+├── Legal_Rule.md                       # EU embedding legal requirements
+├── crawler/                            # Python crawler service
+│   ├── src/
+│   │   ├── main.py
+│   │   ├── crawlers/
+│   │   │   ├── youtube_crawler.py
+│   │   │   ├── social_crawler.py       # LinkedIn, TikTok via SerpAPI
+│   │   │   └── news_crawler.py
+│   │   └── processors/
+│   │       └── ai_classifier.py        # Gemini 2.0 Flash classification
+│   └── requirements.txt
+├── frontend/                           # React/TypeScript app
+│   ├── src/
+│   │   ├── App.tsx                     # Main app with ConsentProvider
+│   │   ├── components/
+│   │   │   ├── consent/                # GDPR consent components
+│   │   │   │   ├── ConsentBanner.tsx
+│   │   │   │   ├── ConsentSettingsModal.tsx
+│   │   │   │   ├── YouTubeEmbed.tsx    # Consent-gated embed
+│   │   │   │   └── ConsentPlaceholder.tsx
+│   │   │   ├── legal/                  # Legal pages
+│   │   │   │   ├── PrivacyPolicyPage.tsx
+│   │   │   │   ├── TermsOfServicePage.tsx
+│   │   │   │   └── DMCARequestPage.tsx
+│   │   │   ├── shared/
+│   │   │   │   └── Footer.tsx          # Footer with legal links
+│   │   │   ├── discovery/              # Discovery UI components
+│   │   │   │   ├── HeroCarousel.tsx
+│   │   │   │   ├── MasonryGrid.tsx
+│   │   │   │   └── LightboxViewer.tsx
+│   │   │   ├── DiscoveryHomePage.tsx
+│   │   │   └── GalleryDetailModal.tsx
+│   │   ├── contexts/
+│   │   │   └── ConsentContext.tsx      # Consent state management
+│   │   ├── hooks/
+│   │   │   └── useConsent.ts
+│   │   ├── services/
+│   │   │   ├── gallery-service.ts
+│   │   │   └── consent-service.ts
+│   │   └── types/
+│   │       ├── gallery.ts
+│   │       └── consent.ts
+│   └── package.json
+└── supabase/
+    └── migrations/
+        ├── 085_application_gallery.sql
+        ├── 087_add_social_source_types.sql
+        └── 088_dmca_requests.sql
+```

@@ -1,6 +1,7 @@
 import { Play, FileText, Image, ExternalLink } from 'lucide-react';
 import type { GalleryItem } from '../types/gallery';
 import { CATEGORY_INFO, SCENE_INFO, CONTENT_TYPE_INFO, EDUCATIONAL_VALUE_INFO } from '../types/gallery';
+import { ReportButton } from './moderation';
 
 interface GalleryCardProps {
   item: GalleryItem;
@@ -100,6 +101,13 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
               <span className="whitespace-nowrap">{new Date(item.published_at).toLocaleDateString()}</span>
             </>
           )}
+          <div className="ml-auto" onClick={(e) => e.stopPropagation()}>
+            <ReportButton
+              itemId={item.id}
+              itemTitle={item.title}
+              contentUrl={item.content_url}
+            />
+          </div>
         </div>
 
         {/* Category & Scene */}

@@ -7,6 +7,7 @@ import type { GalleryItem } from '../../types/gallery';
 import { CATEGORY_INFO, SCENE_INFO } from '../../types/gallery';
 import { incrementViewCount, getRelatedItems } from '../../services/gallery-service';
 import { YouTubeEmbed } from '../consent';
+import { ReportButton } from '../moderation';
 
 interface LightboxViewerProps {
   item: GalleryItem;
@@ -154,6 +155,15 @@ export default function LightboxViewer({
           >
             <Share2 className="w-5 h-5" />
           </button>
+
+          {/* Report */}
+          <div className="[&_button]:p-2 [&_button]:bg-white/10 [&_button]:hover:bg-white/20 [&_button]:rounded-full [&_button]:text-white [&_button]:transition-colors [&_svg]:text-white">
+            <ReportButton
+              itemId={item.id}
+              itemTitle={item.title}
+              contentUrl={item.content_url}
+            />
+          </div>
 
           {/* Fullscreen */}
           <button

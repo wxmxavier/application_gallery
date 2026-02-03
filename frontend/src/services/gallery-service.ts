@@ -433,3 +433,37 @@ export async function getContentTypeStats(): Promise<{
     return [];
   }
 }
+
+/**
+ * Submit a content report
+ */
+export async function submitContentReport(report: {
+  gallery_item_id: string;
+  content_url?: string;
+  content_title?: string;
+  reason: string;
+  description?: string;
+  reporter_email?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase.from('content_reports').insert({
+      gallery_item_id: report.gallery_item_id,
+      content_url: report.content_url,
+      content_title: report.content_title,
+      reason: report.reason,
+      description: report.description,
+      reporter_email: report.reporter_email,
+      status: 'pending',
+    });
+
+    if (error) {
+      console.error('Error submitting report:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('Gallery service error:', err);
+    return { success: false, error: 'Failed to submit report' };
+  }
+}

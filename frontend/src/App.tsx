@@ -4,10 +4,11 @@ import GalleryPage from './components/GalleryPage';
 import { ConsentProvider } from './contexts/ConsentContext';
 import { ConsentBanner } from './components/consent';
 import { PrivacyPolicyPage, TermsOfServicePage, DMCARequestPage } from './components/legal';
+import { AdminModerationPage } from './components/admin';
 import type { GalleryFilters, ApplicationCategory } from './types/gallery';
 
 // Legal page types
-type LegalPage = 'privacy' | 'terms' | 'dmca';
+type LegalPage = 'privacy' | 'terms' | 'dmca' | 'admin';
 
 function AppContent() {
   const [filters, setFilters] = useState<GalleryFilters>({});
@@ -18,9 +19,9 @@ function AppContent() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
 
-    // Check for legal page
+    // Check for legal/admin page
     const page = params.get('page') as LegalPage | null;
-    if (page && ['privacy', 'terms', 'dmca'].includes(page)) {
+    if (page && ['privacy', 'terms', 'dmca', 'admin'].includes(page)) {
       setCurrentPage(page);
       return;
     }
@@ -94,7 +95,7 @@ function AppContent() {
     window.history.replaceState({}, '', newUrl);
   };
 
-  // Render legal page if requested
+  // Render legal/admin page if requested
   if (currentPage) {
     switch (currentPage) {
       case 'privacy':
@@ -103,6 +104,8 @@ function AppContent() {
         return <TermsOfServicePage />;
       case 'dmca':
         return <DMCARequestPage />;
+      case 'admin':
+        return <AdminModerationPage />;
     }
   }
 

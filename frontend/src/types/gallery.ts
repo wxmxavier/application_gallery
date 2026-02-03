@@ -105,6 +105,9 @@ export interface GalleryItem {
   view_count: number;
   featured: boolean;
 
+  // Moderation
+  status?: ItemStatus;  // Optional since not always returned by queries
+
   // Timestamps
   created_at: string;
   updated_at: string;
