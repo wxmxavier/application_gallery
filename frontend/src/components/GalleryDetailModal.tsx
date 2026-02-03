@@ -127,6 +127,7 @@ export default function GalleryDetailModal({ item, onClose }: GalleryDetailModal
               <VideoEmbed
                 contentUrl={item.content_url}
                 title={item.title}
+                thumbnailUrl={item.thumbnail_url}
                 className="w-full h-full"
                 allowFullscreen={true}
               />

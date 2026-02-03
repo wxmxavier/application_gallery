@@ -221,6 +221,7 @@ export default function LightboxViewer({
               <VideoEmbed
                 contentUrl={item.content_url!}
                 title={item.title}
+                thumbnailUrl={item.thumbnail_url}
                 autoplay={isPlaying}
                 className="w-full h-full"
                 allowFullscreen={true}
