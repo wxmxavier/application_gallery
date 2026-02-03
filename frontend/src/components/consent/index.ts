@@ -1,0 +1,5 @@
+// Consent components barrel export
+export { default as ConsentBanner } from './ConsentBanner';
+export { default as ConsentSettingsModal } from './ConsentSettingsModal';
+export { default as ConsentPlaceholder } from './ConsentPlaceholder';
+export { default as YouTubeEmbed } from './YouTubeEmbed';

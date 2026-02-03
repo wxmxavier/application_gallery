@@ -1,15 +1,30 @@
 import { useState, useEffect } from 'react';
 import DiscoveryHomePage from './components/DiscoveryHomePage';
 import GalleryPage from './components/GalleryPage';
+import { ConsentProvider } from './contexts/ConsentContext';
+import { ConsentBanner } from './components/consent';
+import { PrivacyPolicyPage, TermsOfServicePage, DMCARequestPage } from './components/legal';
 import type { GalleryFilters, ApplicationCategory } from './types/gallery';
 
-function App() {
+// Legal page types
+type LegalPage = 'privacy' | 'terms' | 'dmca';
+
+function AppContent() {
   const [filters, setFilters] = useState<GalleryFilters>({});
   const [viewMode, setViewMode] = useState<'discovery' | 'legacy'>('discovery');
+  const [currentPage, setCurrentPage] = useState<LegalPage | null>(null);
 
   // Parse URL parameters on load
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+
+    // Check for legal page
+    const page = params.get('page') as LegalPage | null;
+    if (page && ['privacy', 'terms', 'dmca'].includes(page)) {
+      setCurrentPage(page);
+      return;
+    }
+
     const newFilters: GalleryFilters = {};
 
     const category = params.get('category') as ApplicationCategory | null;
@@ -79,6 +94,19 @@ function App() {
     window.history.replaceState({}, '', newUrl);
   };
 
+  // Render legal page if requested
+  if (currentPage) {
+    switch (currentPage) {
+      case 'privacy':
+        return <PrivacyPolicyPage />;
+      case 'terms':
+        return <TermsOfServicePage />;
+      case 'dmca':
+        return <DMCARequestPage />;
+    }
+  }
+
+  // Render main gallery
   return (
     <div className="min-h-screen bg-gray-50">
       {viewMode === 'discovery' ? (
@@ -93,6 +121,15 @@ function App() {
         />
       )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ConsentProvider>
+      <AppContent />
+      <ConsentBanner />
+    </ConsentProvider>
   );
 }
 

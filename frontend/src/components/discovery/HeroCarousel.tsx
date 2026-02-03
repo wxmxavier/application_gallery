@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Play, ChevronLeft, ChevronRight, Pause, Volume2, VolumeX } from 'lucide-react';
 import type { GalleryItem } from '../../types/gallery';
 import { CATEGORY_INFO } from '../../types/gallery';
+import { YouTubeEmbed } from '../consent';
 
 interface HeroCarouselProps {
   items: GalleryItem[];
@@ -67,11 +68,15 @@ export default function HeroCarousel({
       {/* Background Video/Image */}
       <div className="absolute inset-0">
         {currentItem.media_type === 'video' && videoId ? (
-          <iframe
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&controls=0&showinfo=0&rel=0&playlist=${videoId}`}
-            className="w-full h-full scale-150 pointer-events-none"
-            allow="autoplay; encrypted-media"
+          <YouTubeEmbed
+            videoId={videoId}
             title={currentItem.title}
+            autoplay={true}
+            muted={isMuted}
+            loop={true}
+            controls={false}
+            className="w-full h-full scale-150 pointer-events-none"
+            placeholderClassName="w-full h-full"
           />
         ) : currentItem.thumbnail_url ? (
           <img

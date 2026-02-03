@@ -52,3 +52,49 @@ body {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
+
+/* Consent Banner Animations */
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Legal Page Styles */
+.legal-content h2 {
+  @apply text-xl font-bold text-gray-900 mt-8 mb-4;
+}
+
+.legal-content h3 {
+  @apply text-lg font-semibold text-gray-800 mt-6 mb-3;
+}
+
+.legal-content p {
+  @apply text-gray-600 mb-4;
+}
+
+.legal-content ul,
+.legal-content ol {
+  @apply text-gray-600 mb-4 ml-6 list-disc;
+}
+
+.legal-content ol {
+  @apply list-decimal;
+}
+
+.legal-content li {
+  @apply mb-2;
+}
+
+.legal-content a {
+  @apply text-blue-600 hover:underline;
+}

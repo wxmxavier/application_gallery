@@ -6,6 +6,7 @@ import {
 import type { GalleryItem } from '../../types/gallery';
 import { CATEGORY_INFO, SCENE_INFO } from '../../types/gallery';
 import { incrementViewCount, getRelatedItems } from '../../services/gallery-service';
+import { YouTubeEmbed } from '../consent';
 
 interface LightboxViewerProps {
   item: GalleryItem;
@@ -213,12 +214,12 @@ export default function LightboxViewer({
         >
           {item.media_type === 'video' && videoId ? (
             <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
-              <iframe
-                src={`https://www.youtube.com/embed/${videoId}?autoplay=${isPlaying ? 1 : 0}&rel=0`}
-                className="w-full h-full"
-                allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              <YouTubeEmbed
+                videoId={videoId}
                 title={item.title}
+                autoplay={isPlaying}
+                className="w-full h-full"
+                allowFullscreen={true}
               />
             </div>
           ) : item.thumbnail_url || item.content_url ? (
