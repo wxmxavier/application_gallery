@@ -1,5 +1,5 @@
 // Consent-gated TikTok embed component
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useConsent } from '../../hooks/useConsent';
 import ConsentPlaceholder from './ConsentPlaceholder';
 
@@ -15,29 +15,34 @@ interface TikTokEmbedProps {
  * Extract TikTok video ID from various URL formats
  * Supports:
  * - https://www.tiktok.com/@username/video/1234567890
+ * - https://www.tiktok.com/@username/video/1234567890?...
  * - https://vm.tiktok.com/ABC123/
  */
 function extractTikTokId(url?: string): string | null {
   if (!url) return null;
 
-  // Standard video URL format
+  // Standard video URL format: tiktok.com/@username/video/1234567890
   const videoMatch = url.match(/\/video\/(\d+)/);
   if (videoMatch) return videoMatch[1];
 
-  // Short URL format (vm.tiktok.com) - we can't resolve this without an API call
-  // For now, return the full URL as identifier
+  // Short URL format (vm.tiktok.com) - can't resolve without API
+  // Return null and handle separately
   if (url.includes('vm.tiktok.com')) {
-    return url;
+    return null;
   }
 
   return null;
 }
 
 /**
- * Check if the ID is a full URL (short link) or just the video ID
+ * Get TikTok thumbnail URL from video ID
+ * Note: TikTok doesn't have a public thumbnail API like YouTube,
+ * so we'll use a placeholder or the thumbnail from the database
  */
-function isFullUrl(id: string): boolean {
-  return id.startsWith('http');
+function getTikTokThumbnail(_videoId: string): string | undefined {
+  // TikTok doesn't provide a public thumbnail API
+  // The thumbnail should come from the database (crawled via SerpAPI)
+  return undefined;
 }
 
 export default function TikTokEmbed({
@@ -49,45 +54,49 @@ export default function TikTokEmbed({
 }: TikTokEmbedProps) {
   const { hasMarketingConsent, showSettings } = useConsent();
   const [loadedManually, setLoadedManually] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   // Resolve video ID from either prop
-  const resolvedId = videoId || extractTikTokId(contentUrl);
+  const resolvedVideoId = videoId || extractTikTokId(contentUrl);
 
-  // Load TikTok embed script when consent is given
-  useEffect(() => {
-    if ((hasMarketingConsent || loadedManually) && resolvedId && !isLoaded) {
-      // Load TikTok embed script
-      const existingScript = document.querySelector(
-        'script[src="https://www.tiktok.com/embed.js"]'
+  // If no video ID (e.g., short URL), we can't embed directly
+  // Show a link to the original instead
+  if (!resolvedVideoId) {
+    if (!hasMarketingConsent && !loadedManually) {
+      return (
+        <ConsentPlaceholder
+          platform="tiktok"
+          title={title}
+          onLoadContent={() => setLoadedManually(true)}
+          onManageSettings={showSettings}
+          className={placeholderClassName || className}
+        />
       );
-
-      if (!existingScript) {
-        const script = document.createElement('script');
-        script.src = 'https://www.tiktok.com/embed.js';
-        script.async = true;
-        script.onload = () => {
-          setIsLoaded(true);
-          // Re-process embeds after script loads
-          if (window.tiktokEmbed) {
-            window.tiktokEmbed.reloadEmbeds();
-          }
-        };
-        document.body.appendChild(script);
-      } else {
-        setIsLoaded(true);
-        // Re-process embeds if script already loaded
-        if (window.tiktokEmbed) {
-          window.tiktokEmbed.reloadEmbeds();
-        }
-      }
     }
-  }, [hasMarketingConsent, loadedManually, resolvedId, isLoaded]);
 
-  // If no video ID, show nothing
-  if (!resolvedId) {
-    return null;
+    // Can't embed, show link to original
+    return (
+      <div className={`flex items-center justify-center bg-black ${className}`} style={{ minHeight: '400px' }}>
+        <div className="text-center p-6">
+          <div className="mb-4">
+            <svg viewBox="0 0 24 24" className="w-12 h-12 mx-auto" fill="currentColor">
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+            </svg>
+          </div>
+          <p className="text-white font-medium mb-2 line-clamp-2">{title}</p>
+          <p className="text-white/60 text-sm mb-4">This video requires viewing on TikTok</p>
+          {contentUrl && (
+            <a
+              href={contentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-6 py-2 bg-[#fe2c55] text-white rounded-lg font-medium hover:bg-[#e91e4d] transition-colors"
+            >
+              Watch on TikTok
+            </a>
+          )}
+        </div>
+      </div>
+    );
   }
 
   // Show placeholder if no marketing consent and not manually loaded
@@ -96,6 +105,7 @@ export default function TikTokEmbed({
       <ConsentPlaceholder
         platform="tiktok"
         title={title}
+        thumbnailUrl={getTikTokThumbnail(resolvedVideoId)}
         onLoadContent={() => setLoadedManually(true)}
         onManageSettings={showSettings}
         className={placeholderClassName || className}
@@ -103,39 +113,25 @@ export default function TikTokEmbed({
     );
   }
 
-  // Determine embed URL
-  const embedUrl = isFullUrl(resolvedId)
-    ? resolvedId
-    : `https://www.tiktok.com/embed/v2/${resolvedId}`;
+  // TikTok embed iframe
+  // Using TikTok's official embed URL format
+  const embedUrl = `https://www.tiktok.com/embed/v2/${resolvedVideoId}`;
 
   return (
-    <div ref={containerRef} className={className}>
-      <blockquote
-        className="tiktok-embed"
-        cite={embedUrl}
-        data-video-id={isFullUrl(resolvedId) ? undefined : resolvedId}
-        style={{ maxWidth: '605px', minWidth: '325px' }}
-      >
-        <section>
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            title={title}
-            href={embedUrl}
-          >
-            {title}
-          </a>
-        </section>
-      </blockquote>
+    <div className={className} style={{ minHeight: '400px' }}>
+      <iframe
+        src={embedUrl}
+        title={title}
+        style={{
+          width: '100%',
+          height: '100%',
+          minHeight: '400px',
+          border: 'none',
+        }}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+      />
     </div>
   );
-}
-
-// Extend Window interface for TikTok embed
-declare global {
-  interface Window {
-    tiktokEmbed?: {
-      reloadEmbeds: () => void;
-    };
-  }
 }

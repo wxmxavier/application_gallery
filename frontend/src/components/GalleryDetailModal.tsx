@@ -4,7 +4,7 @@ import type { GalleryItem } from '../types/gallery';
 import { CATEGORY_INFO, SCENE_INFO, CONTENT_TYPE_INFO, EDUCATIONAL_VALUE_INFO } from '../types/gallery';
 import { incrementViewCount, getRelatedItems } from '../services/gallery-service';
 import GalleryCard from './GalleryCard';
-import { YouTubeEmbed } from './consent';
+import { VideoEmbed } from './consent';
 import { ReportButton } from './moderation';
 
 interface GalleryDetailModalProps {
@@ -124,7 +124,7 @@ export default function GalleryDetailModal({ item, onClose }: GalleryDetailModal
           {/* Media Player */}
           <div className="aspect-video bg-gray-900 rounded-lg overflow-hidden mb-6">
             {item.media_type === 'video' && item.content_url ? (
-              <YouTubeEmbed
+              <VideoEmbed
                 contentUrl={item.content_url}
                 title={item.title}
                 className="w-full h-full"

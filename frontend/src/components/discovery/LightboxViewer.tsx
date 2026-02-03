@@ -6,7 +6,7 @@ import {
 import type { GalleryItem } from '../../types/gallery';
 import { CATEGORY_INFO, SCENE_INFO } from '../../types/gallery';
 import { incrementViewCount, getRelatedItems } from '../../services/gallery-service';
-import { YouTubeEmbed } from '../consent';
+import { VideoEmbed } from '../consent';
 import { ReportButton } from '../moderation';
 
 interface LightboxViewerProps {
@@ -81,14 +81,8 @@ export default function LightboxViewer({
     }
   }, []);
 
-  // Extract YouTube video ID
-  const getYouTubeId = (url?: string) => {
-    if (!url) return null;
-    const match = url.match(/(?:embed\/|v=|\/v\/|youtu\.be\/)([^&?#]+)/);
-    return match ? match[1] : null;
-  };
-
-  const videoId = getYouTubeId(item.content_url);
+  // Check if item has video content
+  const hasVideoContent = item.media_type === 'video' && item.content_url;
 
   // Format duration
   const formatDuration = (seconds?: number) => {
@@ -222,10 +216,10 @@ export default function LightboxViewer({
           className="w-full max-w-5xl mx-4"
           onClick={(e) => e.stopPropagation()}
         >
-          {item.media_type === 'video' && videoId ? (
+          {hasVideoContent ? (
             <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
-              <YouTubeEmbed
-                videoId={videoId}
+              <VideoEmbed
+                contentUrl={item.content_url!}
                 title={item.title}
                 autoplay={isPlaying}
                 className="w-full h-full"

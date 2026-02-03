@@ -5,3 +5,4 @@ export { default as ConsentPlaceholder } from './ConsentPlaceholder';
 export { default as YouTubeEmbed } from './YouTubeEmbed';
 export { default as TikTokEmbed } from './TikTokEmbed';
 export { default as LinkedInEmbed } from './LinkedInEmbed';
+export { default as VideoEmbed } from './VideoEmbed';

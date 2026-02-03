@@ -8,6 +8,15 @@ interface GalleryCardProps {
   onClick: () => void;
 }
 
+/**
+ * Check if URL is from TikTok
+ */
+function isTikTokUrl(url?: string): boolean {
+  if (!url) return false;
+  const lowerUrl = url.toLowerCase();
+  return lowerUrl.includes('tiktok.com') || lowerUrl.includes('vm.tiktok.com');
+}
+
 export default function GalleryCard({ item, onClick }: GalleryCardProps) {
   const categoryInfo = CATEGORY_INFO[item.application_category];
   const sceneInfo = item.scene_type ? SCENE_INFO[item.scene_type] : null;
@@ -47,10 +56,27 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
 
         {/* Play overlay for videos */}
         {item.media_type === 'video' && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
+          <div
+            className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={(e) => {
+              // For TikTok videos, open directly on TikTok
+              if (isTikTokUrl(item.content_url) && item.content_url) {
+                e.stopPropagation();
+                window.open(item.content_url, '_blank', 'noopener,noreferrer');
+              }
+              // For other videos, let the card onClick handle it (opens modal)
+            }}
+          >
+            <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center hover:scale-110 transition-transform">
               <Play className="w-8 h-8 text-gray-900 ml-1" />
             </div>
+            {/* TikTok indicator */}
+            {isTikTokUrl(item.content_url) && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/70 text-white text-xs rounded-full flex items-center gap-1">
+                <ExternalLink className="w-3 h-3" />
+                Watch on TikTok
+              </div>
+            )}
           </div>
         )}
 
