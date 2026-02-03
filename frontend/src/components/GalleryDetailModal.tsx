@@ -133,11 +133,18 @@ export default function GalleryDetailModal({ item, onClose }: GalleryDetailModal
                 allowFullscreen={true}
               />
             ) : item.thumbnail_url ? (
-              <img
-                src={item.thumbnail_url}
-                alt={item.title}
-                className="w-full h-full object-contain"
-              />
+              <a
+                href={item.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full h-full"
+              >
+                <img
+                  src={item.thumbnail_url}
+                  alt={item.title}
+                  className="w-full h-full object-contain cursor-pointer hover:opacity-90 transition-opacity"
+                />
+              </a>
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-500">
                 No preview available

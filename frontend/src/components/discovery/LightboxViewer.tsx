@@ -235,11 +235,18 @@ export default function LightboxViewer({
               />
             </div>
           ) : item.thumbnail_url || item.content_url ? (
-            <img
-              src={item.content_url || item.thumbnail_url}
-              alt={item.title}
-              className="max-h-[70vh] mx-auto rounded-lg object-contain"
-            />
+            <a
+              href={item.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
+            >
+              <img
+                src={item.content_url || item.thumbnail_url}
+                alt={item.title}
+                className="max-h-[70vh] mx-auto rounded-lg object-contain cursor-pointer hover:opacity-90 transition-opacity"
+              />
+            </a>
           ) : (
             <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center">
               <span className="text-white/60">No preview available</span>
