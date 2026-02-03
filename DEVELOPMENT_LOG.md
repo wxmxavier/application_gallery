@@ -1127,5 +1127,105 @@ frontend/src/
 
 ---
 
+## Session 7: 2026-02-03 - TikTok & Media Linking Fixes
+
+### Overview
+
+Fixed critical issue where TikTok videos and other media content weren't clickable in detail modals. The root cause was that TikTok items have `content_url = null` with the actual TikTok link stored in `source_url`.
+
+### Problem Analysis
+
+**Database Structure for Different Sources:**
+
+| Source | content_url | source_url | media_type |
+|--------|-------------|------------|------------|
+| YouTube | `youtube.com/embed/...` | `youtube.com/watch?v=...` | video |
+| TikTok | `null` | `tiktok.com/@user/video/...` | video |
+| LinkedIn | `null` | `linkedin.com/posts/...` | article |
+| Images | `image-url.jpg` | `article-url.com/...` | image |
+
+**Root Cause:**
+- Code checked `item.media_type === 'video' && item.content_url`
+- TikTok items failed this check because `content_url` is null
+- Result: Static image displayed instead of clickable video embed
+
+### Fixes Implemented
+
+#### 1. GalleryCard.tsx
+- Changed TikTok detection from `content_url` to `source_url`
+- Play button on TikTok cards now links directly to TikTok
+
+```typescript
+// Before: isTikTokUrl(item.content_url)
+// After: isTikTokSource(item.source_url)
+```
+
+#### 2. VideoEmbed.tsx
+- Added `sourceUrl` prop for TikTok link detection
+- Platform detection checks both `contentUrl` and `sourceUrl`
+- Links to `sourceUrl` for TikTok items
+
+```typescript
+const contentPlatform = detectPlatform(contentUrl);
+const sourcePlatform = sourceUrl ? detectPlatform(sourceUrl) : 'unknown';
+const platform = sourcePlatform === 'tiktok' ? 'tiktok' : contentPlatform;
+const linkUrl = isTikTok && sourceUrl ? sourceUrl : contentUrl;
+```
+
+#### 3. GalleryDetailModal.tsx
+- Updated condition: `(item.content_url || item.source_url)`
+- VideoEmbed receives both URLs
+- Fallback image now wrapped in anchor linking to `source_url`
+
+```typescript
+// Before: item.media_type === 'video' && item.content_url
+// After: item.media_type === 'video' && (item.content_url || item.source_url)
+```
+
+#### 4. LightboxViewer.tsx
+- Same fallback logic for `hasVideoContent`
+- Images/articles now clickable, linking to source
+
+### Content Statistics
+
+| Content Type | Count | Notes |
+|--------------|-------|-------|
+| Videos | 327 | YouTube (embeddable), TikTok (link only) |
+| Images | 69 | Click to open source article |
+| Articles | 104 | LinkedIn (50), news sites |
+| **TikTok** | **280** | All link to TikTok via source_url |
+| **LinkedIn** | **50** | All articles, no videos |
+
+### Behavior Summary
+
+| Content | Card Click | Modal Image Click |
+|---------|------------|-------------------|
+| YouTube video | Opens modal | Embedded player |
+| TikTok video | Opens modal | Opens TikTok in new tab |
+| LinkedIn article | Opens modal | Opens LinkedIn in new tab |
+| Image | Opens modal | Opens source article in new tab |
+
+### Git Commits
+
+1. `bd8a414` - Fix TikTok video linking: handle null content_url
+2. `15e52ca` - Make images and articles clickable to source URL
+
+### Files Modified
+
+| File | Change |
+|------|--------|
+| `GalleryCard.tsx` | TikTok detection via source_url |
+| `VideoEmbed.tsx` | Added sourceUrl prop, dual platform detection |
+| `GalleryDetailModal.tsx` | Fallback to source_url, clickable images |
+| `LightboxViewer.tsx` | Same fallback logic |
+
+### Lessons Learned
+
+1. **Check actual database values** - Don't assume URL field contains expected data
+2. **Different sources have different structures** - TikTok/LinkedIn store URLs differently than YouTube
+3. **Fallback patterns** - Use `(primary || fallback)` pattern for optional fields
+
+---
+
 *Log maintained by development team*
 *Last updated: 2026-02-03*
