@@ -81,8 +81,14 @@ export default function LightboxViewer({
     }
   }, []);
 
-  // Check if item has video content
-  const hasVideoContent = item.media_type === 'video' && item.content_url;
+  // Check if item has video content (content_url or source_url for TikTok)
+  const hasVideoContent = item.media_type === 'video' && (item.content_url || item.source_url);
+
+  // Check if it's a YouTube video (can be played inline)
+  const isYouTubeVideo = item.content_url && (
+    item.content_url.includes('youtube.com') ||
+    item.content_url.includes('youtu.be')
+  );
 
   // Format duration
   const formatDuration = (seconds?: number) => {
@@ -219,7 +225,8 @@ export default function LightboxViewer({
           {hasVideoContent ? (
             <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
               <VideoEmbed
-                contentUrl={item.content_url!}
+                contentUrl={item.content_url || item.source_url}
+                sourceUrl={item.source_url}
                 title={item.title}
                 thumbnailUrl={item.thumbnail_url}
                 autoplay={isPlaying}
@@ -239,8 +246,8 @@ export default function LightboxViewer({
             </div>
           )}
 
-          {/* Video Controls (for video) */}
-          {item.media_type === 'video' && (
+          {/* Video Controls (only for YouTube videos that play inline) */}
+          {isYouTubeVideo && (
             <div className="flex justify-center mt-4">
               <button
                 onClick={() => setIsPlaying(!isPlaying)}

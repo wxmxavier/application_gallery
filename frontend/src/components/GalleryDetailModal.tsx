@@ -123,9 +123,10 @@ export default function GalleryDetailModal({ item, onClose }: GalleryDetailModal
         <div className="p-6">
           {/* Media Player */}
           <div className="aspect-video bg-gray-900 rounded-lg overflow-hidden mb-6">
-            {item.media_type === 'video' && item.content_url ? (
+            {item.media_type === 'video' && (item.content_url || item.source_url) ? (
               <VideoEmbed
-                contentUrl={item.content_url}
+                contentUrl={item.content_url || item.source_url}
+                sourceUrl={item.source_url}
                 title={item.title}
                 thumbnailUrl={item.thumbnail_url}
                 className="w-full h-full"
