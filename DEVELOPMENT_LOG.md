@@ -640,6 +640,156 @@ New indexes and functions for efficient filtering.
 
 ---
 
+## Session 5: 2026-02-02 - Social Media Expansion & Legal Compliance Review
+
+### Phase 1: Strict Reclassification
+
+**Problem:** Most content was classified as "real_application" (73%) which was too generous. Many videos showing basic robot capabilities were not actual deployments.
+
+**Solution:** Created stricter V3 classifier with explicit rules:
+- Holiday videos, dancing robots → tech_demo
+- Trade show demos → tech_demo
+- Lab/R&D footage → tech_demo
+- Only actual customer deployments → real_application
+
+**Results After Reclassification:**
+| Content Type | Before | After |
+|--------------|--------|-------|
+| tech_demo | 51 (10%) | 295 (63%) |
+| real_application | 357 (73%) | 76 (16%) |
+| product_announcement | 28 (6%) | 31 (7%) |
+| case_study | 31 (6%) | 38 (8%) |
+| tutorial | 16 (3%) | 20 (4%) |
+| pilot_poc | 4 (1%) | 6 (1%) |
+
+### Phase 2: Social Media Crawler Implementation
+
+**New Crawlers Created:**
+- `crawler/src/crawlers/social_crawler.py` - LinkedIn/TikTok via SerpAPI
+- `crawler/src/crawl_social.py` - Full crawl, classify, store pipeline
+- `crawler/src/crawl_tiktok_expanded.py` - Comprehensive TikTok search
+
+**Database Migration 087:**
+- Added source types: linkedin, tiktok, twitter, instagram
+
+**Crawl Results:**
+| Platform | Items Crawled |
+|----------|---------------|
+| LinkedIn | 50 |
+| TikTok | 414 |
+
+**Final Gallery Totals: 931 items**
+| Source | Count |
+|--------|-------|
+| TikTok | 414 |
+| SerpAPI Images | 174 |
+| SerpAPI News | 170 |
+| YouTube | 123 |
+| LinkedIn | 50 |
+
+### Phase 3: UI/UX Improvements
+
+**Card Design Cleanup:**
+- Removed intrusive badges from thumbnails (Video, Real Application)
+- Added colored left border to indicate content type:
+  - Green = Real Application
+  - Blue = Case Study
+  - Orange = Tech Demo
+  - Purple = Pilot/POC
+  - Pink = Product Announcement
+  - Cyan = Tutorial
+- Content type shown as subtle text below thumbnail
+- Clean thumbnails with full visual content visible
+
+**Advanced Filters Added:**
+- Environment filter: Warehouse, Manufacturing, Hospital, Hotel, Retail, etc.
+- Task filter: Delivery, Inspection, Welding, Palletizing, Assembly, etc.
+- Multi-select for task types
+- "More Filters" expandable panel
+- Active filter chips with remove buttons
+
+### Phase 4: Legal & Compliance Analysis
+
+**Expert Team Review Conducted:**
+- Legal Expert (Data Protection & IP)
+- Software Architect
+- Product Manager
+- UI/UX Designer
+
+**Critical Findings (see EXPERT_ANALYSIS_REPORT.md):**
+
+#### GDPR Compliance Gaps (HIGH RISK)
+| Issue | Current State | Requirement |
+|-------|---------------|-------------|
+| Cookie Consent | ❌ None | Must obtain consent BEFORE loading embeds |
+| Privacy Policy | ❌ None | Must disclose data recipients |
+| Joint Controller | ❌ Not addressed | Site is joint controller with platforms |
+
+#### Copyright/IP Concerns (MEDIUM RISK)
+| Issue | Current State | Requirement |
+|-------|---------------|-------------|
+| Image Hosting | Hotlinking | Should use official embed or license |
+| Embedding Rights | Assumed | Must respect "embedding disabled" |
+| Takedown Process | ❌ None | Need DMCA procedure |
+
+---
+
+## Compliance TODO List (Prioritized)
+
+### 🔴 P0 - MUST DO Before Public Launch
+
+| # | Task | Owner | Effort | Status |
+|---|------|-------|--------|--------|
+| 1 | Implement Cookie Consent Management (CMP) | Dev | 2d | ❌ TODO |
+| 2 | Create Privacy Policy page | Legal | 1d | ❌ TODO |
+| 3 | Create Terms of Service page | Legal | 1d | ❌ TODO |
+| 4 | Implement "click-to-load" for YouTube embeds | Dev | 1d | ❌ TODO |
+| 5 | Add consent gate to all embed components | Dev | 2d | ❌ TODO |
+| 6 | Create DMCA/takedown request form | Dev+Legal | 1d | ❌ TODO |
+
+### 🟠 P1 - SHOULD DO After Launch
+
+| # | Task | Owner | Effort | Status |
+|---|------|-------|--------|--------|
+| 7 | Implement proper TikTok embed player | Dev | 3d | ❌ TODO |
+| 8 | Implement proper LinkedIn embed/preview | Dev | 2d | ❌ TODO |
+| 9 | Review SerpAPI image copyright status | Content | 3d | ❌ TODO |
+| 10 | Add content moderation queue | Dev+PM | 3d | ❌ TODO |
+| 11 | Implement content reporting feature | Dev | 2d | ❌ TODO |
+
+### 🟡 P2 - User Features
+
+| # | Task | Status |
+|---|------|--------|
+| 12 | User authentication (SSO with RSIP) | ❌ TODO |
+| 13 | Favorites/collections | ❌ TODO |
+| 14 | View history | ❌ TODO |
+| 15 | Admin moderation dashboard | ❌ TODO |
+
+### 🟢 P3 - Future Enhancements
+
+| # | Task | Status |
+|---|------|--------|
+| 16 | RSIP platform deep integration | ❌ TODO |
+| 17 | Multi-language support | ❌ TODO |
+| 18 | Analytics dashboard | ❌ TODO |
+| 19 | Mobile app | ❌ TODO |
+
+---
+
+## Files Created This Session
+
+| File | Purpose |
+|------|---------|
+| `crawler/src/crawlers/social_crawler.py` | LinkedIn/TikTok crawler via SerpAPI |
+| `crawler/src/crawl_social.py` | Social media crawl pipeline |
+| `crawler/src/crawl_tiktok_expanded.py` | Comprehensive TikTok crawler |
+| `crawler/src/reclassify_v3.py` | Strict reclassification script |
+| `supabase/migrations/087_add_social_source_types.sql` | Add social platform source types |
+| `EXPERT_ANALYSIS_REPORT.md` | Legal, architecture, PM, UI analysis |
+
+---
+
 ## Lessons Learned
 
 1. **Application-centric design** is more valuable than robot-centric for user education
@@ -647,6 +797,25 @@ New indexes and functions for efficient filtering.
 3. **Migration numbering** must be coordinated across RSIP project folders
 4. **Multi-source content** (not just YouTube) provides better coverage
 5. **Content type classification** is essential to separate demos from real deployments
+6. **GDPR compliance is critical** - embeds require consent before loading in EU
+7. **Clean UI trumps information density** - badges covering thumbnails hurt UX
+8. **Legal review before launch** - must address compliance before going public
+
+---
+
+## Technology Stack Summary
+
+| Component | Technology |
+|-----------|------------|
+| Frontend | React 18 + TypeScript + Tailwind CSS |
+| Build | Vite 5 |
+| Database | Supabase (PostgreSQL) |
+| Crawlers | Python 3.11 |
+| AI Classification | Google Gemini 2.0 Flash |
+| Search API | SerpAPI (Google Search) |
+| Video Sources | YouTube, TikTok |
+| Social Sources | LinkedIn |
+| Deployment (planned) | Vercel (frontend), Cloud Run (crawlers) |
 
 ---
 
