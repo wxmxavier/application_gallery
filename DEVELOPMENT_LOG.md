@@ -1227,5 +1227,161 @@ const linkUrl = isTikTok && sourceUrl ? sourceUrl : contentUrl;
 
 ---
 
+## Session 8: 2026-02-04 - Social Media Expansion & Interview Classification
+
+### Overview
+
+Expanded content crawling to Facebook, X/Twitter, and Instagram. Implemented interview/commentary detection to separate videos showing people speaking from actual robot footage.
+
+### Phase 1: Social Media Crawler Implementation
+
+**Research on Official Embedding:**
+- **X/Twitter**: Public oEmbed API (no auth required) - `publish.twitter.com/oembed`
+- **Facebook/Instagram**: Requires Meta oEmbed Read with app registration (retired old oEmbed April 2025)
+
+**Files Created:**
+| File | Purpose |
+|------|---------|
+| `crawler/src/crawl_linkedin_media.py` | Dedicated LinkedIn video/image crawler |
+| `crawler/src/crawl_social_platforms.py` | Multi-platform crawler (X, Facebook, Instagram) |
+| `supabase/migrations/090_add_facebook_source_type.sql` | Add 'facebook' to source_type constraint |
+
+**Crawler Methods Added to `social_crawler.py`:**
+- `search_twitter()` - X/Twitter video and post search
+- `search_facebook()` - Facebook video search
+- `search_instagram()` - Instagram reels and image search
+- `_search_google_video()` - Google video search via SerpAPI
+- `_search_google_images()` - Google image search via SerpAPI
+- `crawl_all_social_platforms()` - Main function to crawl all platforms
+- `crawl_linkedin_media()` - LinkedIn-specific video/image crawl
+
+### Phase 2: Content Crawl Results
+
+**LinkedIn Media Crawl:**
+- Videos: 59 new items
+- Images: 93 new items
+- Total: 152 new LinkedIn items
+
+**Social Platforms Crawl:**
+| Platform | Found | Stored |
+|----------|-------|--------|
+| X/Twitter | 93 | 89 (4 non-tweet URLs removed) |
+| Facebook | 88 | 88 |
+| Instagram | 100 | 100 |
+
+### Phase 3: Twitter Thumbnail Fixes
+
+**Problem:** 25 Twitter items had no thumbnails (showing placeholder).
+
+**Solution:**
+1. Used Twitter syndication API to fetch media thumbnails
+2. Set default X logo for text-only tweets
+3. Removed 4 invalid URLs (profile pages, hashtag pages, communities)
+4. Changed 10 text-only tweets to `media_type: article`
+
+### Phase 4: Interview & Comment Classification
+
+**Problem:** Many videos showed people speaking (interviews, commentary, news anchors) rather than robot footage, but were classified as "Real Application" or "Tech Demo".
+
+**Solution:** Created new content type `interview_comment`.
+
+**Migration Created:**
+`supabase/migrations/091_add_interview_comment_content_type.sql`
+
+**Detection Criteria:**
+- Interviews with executives, founders, experts
+- Commentary and reaction videos
+- News reports with anchors talking
+- Testimonials with people speaking to camera
+- Title patterns: "conversation", "interview", "talks", "explains", "Q&A"
+- Personal commentary channels
+
+**AI Classification Process:**
+1. Batch analysis of 772 videos using Gemini 2.0 Flash
+2. Keyword-based detection for interview patterns
+3. Source-based detection (news channels, personal accounts)
+4. Manual review and false positive correction
+
+**Results:**
+- 98 videos classified as `interview_comment`
+- Reverted 17 false positives (robot footage with "Future of" titles)
+
+### Phase 5: Frontend Updates
+
+**Files Modified:**
+| File | Changes |
+|------|---------|
+| `frontend/src/types/gallery.ts` | Added `interview_comment` to ContentType, added `facebook`, `instagram`, `tiktok` to SourceType |
+| `frontend/src/services/gallery-service.ts` | Added `interview_comment` to stats type |
+
+**Display Configuration:**
+```typescript
+interview_comment: {
+  label: 'Interview & Comment',
+  labelZh: '访谈与评论',
+  icon: '🎤',
+  color: 'bg-orange-100 text-orange-800 border-orange-300',
+  description: 'Interviews, commentary, or reactions about robots',
+}
+```
+
+### Final Content Statistics
+
+**By Source (1,360 total):**
+| Source | Count |
+|--------|-------|
+| TikTok | 414 |
+| LinkedIn | 202 |
+| SerpAPI Images | 174 |
+| SerpAPI News | 170 |
+| YouTube | 123 |
+| Instagram | 100 |
+| X/Twitter | 89 |
+| Facebook | 88 |
+
+**By Media Type:**
+| Type | Count |
+|------|-------|
+| Videos | 772 |
+| Images | 357 |
+| Articles | 231 |
+
+**Video Content Type Distribution:**
+| Content Type | Count | % |
+|--------------|-------|---|
+| Tech Demo | 245 | 31.7% |
+| Product Announcement | 241 | 31.2% |
+| Real Application | 154 | 19.9% |
+| Interview & Comment | 98 | 12.7% |
+| Tutorial | 20 | 2.6% |
+| Case Study | 13 | 1.7% |
+| Pilot/POC | 4 | 0.5% |
+
+### Git Commit
+
+```
+b23277a Add social media crawlers and interview_comment content type
+```
+
+**Files committed:**
+- `crawler/src/crawlers/social_crawler.py`
+- `crawler/src/crawl_linkedin_media.py`
+- `crawler/src/crawl_social_platforms.py`
+- `frontend/src/types/gallery.ts`
+- `frontend/src/services/gallery-service.ts`
+- `supabase/migrations/090_add_facebook_source_type.sql`
+- `supabase/migrations/091_add_interview_comment_content_type.sql`
+
+### Lessons Learned
+
+1. **Official embed APIs have changed** - Meta retired old oEmbed in April 2025, now requires app registration
+2. **X/Twitter oEmbed is still public** - No authentication needed for basic embedding
+3. **SerpAPI works well for discovery** - Can find social media content without platform-specific APIs
+4. **Interview detection needs multiple signals** - Title keywords + source analysis + AI classification
+5. **Official channels can have interviews too** - Don't skip company channels entirely when detecting commentary
+6. **"Future of X" titles are ambiguous** - Can be either robot demos or commentary, need careful review
+
+---
+
 *Log maintained by development team*
-*Last updated: 2026-02-03*
+*Last updated: 2026-02-04*
