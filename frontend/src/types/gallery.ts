@@ -11,6 +11,7 @@ export type ContentType =
   | 'tech_demo'         // Capability demonstration
   | 'product_announcement' // New product reveal
   | 'tutorial'          // How-to content
+  | 'interview_comment' // Interviews, commentary, reactions
   | 'unknown';
 
 // V2: Deployment maturity
@@ -34,6 +35,9 @@ export type SourceType =
   | 'youtube'
   | 'linkedin'
   | 'twitter'
+  | 'facebook'
+  | 'instagram'
+  | 'tiktok'
   | 'research'
   | 'case_study'
   | 'serpapi_news'
@@ -197,6 +201,13 @@ export const CONTENT_TYPE_INFO: Record<ContentType, {
     icon: '📚',
     color: 'bg-indigo-100 text-indigo-800 border-indigo-300',
     description: 'How-to or educational content',
+  },
+  interview_comment: {
+    label: 'Interview & Comment',
+    labelZh: '访谈与评论',
+    icon: '🎤',
+    color: 'bg-orange-100 text-orange-800 border-orange-300',
+    description: 'Interviews, commentary, or reactions about robots',
   },
   unknown: {
     label: 'Uncategorized',

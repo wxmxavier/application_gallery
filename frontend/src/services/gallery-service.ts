@@ -404,6 +404,7 @@ export async function getGalleryStats(): Promise<{
         tech_demo: 0,
         product_announcement: 0,
         tutorial: 0,
+        interview_comment: 0,
         unknown: 0,
       },
       qualityContent: 0,
