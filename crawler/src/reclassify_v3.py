@@ -89,7 +89,7 @@ Current Classification: {current_content_type}
 
 Respond with JSON only:
 {{
-  "content_type": "real_application|pilot_poc|case_study|tech_demo|product_announcement|tutorial",
+  "content_type": "real_application|pilot_poc|case_study|tech_demo|product_announcement|tutorial|interview_comment",
   "educational_value": 1-5,
   "reasoning": "brief explanation"
 }}

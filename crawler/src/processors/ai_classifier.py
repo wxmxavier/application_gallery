@@ -59,9 +59,11 @@ CLASSIFICATION TASKS:
    - unknown: Cannot determine
 
 3. APPLICATION_CATEGORY (choose one):
-   - industrial_automation: Factory, warehouse, manufacturing, logistics
-   - service_robotics: Hospitality, healthcare, delivery, cleaning
-   - surveillance_security: Patrol, monitoring, inspection, access control
+   - industrial: Factory, warehouse, manufacturing, assembly, material handling, logistics
+   - professional_service: Delivery, hospitality, cleaning, security, agriculture, construction, education
+   - personal_service: Domestic (home cleaning, lawn), companion, entertainment
+   - medical: Surgical, rehabilitation, pharmacy, diagnostic, hospital
+   - specialized_environment: Defense, hazardous environment, space, underwater
 
 4. SPECIFIC_TASKS (be specific, choose 1-3):
    Industrial: pallet_transport, tote_transport, cart_towing, dock_to_stock,
@@ -107,7 +109,7 @@ Return ONLY valid JSON (no markdown):
 {{
   "content_type": "real_application",
   "deployment_maturity": "production",
-  "application_category": "industrial_automation",
+  "application_category": "industrial",
   "specific_tasks": ["pallet_transport", "dock_to_stock"],
   "task_types": ["transportation"],
   "scene_type": "warehouse",
@@ -154,13 +156,15 @@ class RSIPClassifier:
         # Valid values for validation
         self.valid_content_types = [
             "real_application", "pilot_poc", "case_study",
-            "tech_demo", "product_announcement", "tutorial", "unknown"
+            "tech_demo", "product_announcement", "tutorial",
+            "interview_comment", "unknown"
         ]
         self.valid_deployment_maturity = [
             "production", "pilot", "prototype", "concept", "unknown"
         ]
         self.valid_categories = [
-            "industrial_automation", "service_robotics", "surveillance_security"
+            "industrial", "professional_service", "personal_service",
+            "medical", "specialized_environment"
         ]
         self.valid_task_types = [
             # Legacy broad types (for backward compatibility)
@@ -280,7 +284,7 @@ class RSIPClassifier:
 
         # Validate category
         if result.get("application_category") not in self.valid_categories:
-            result["application_category"] = "industrial_automation"
+            result["application_category"] = "industrial"
 
         # Validate and map specific_tasks to task_types for backward compatibility
         specific_tasks = [
@@ -375,6 +379,12 @@ class RSIPClassifier:
             "access_verification": "access_monitoring",
             "remote_monitoring": "perimeter_patrol",
             "facility_inspection": "inspection",
+            # Medical
+            "surgical_procedure": "healthcare_assist",
+            "rehabilitation_therapy": "healthcare_assist",
+            "pharmacy_dispensing": "delivery_service",
+            # Specialized/hazardous
+            "hazardous_inspection": "inspection",
         }
 
         broad_tasks = set()
@@ -391,7 +401,7 @@ class RSIPClassifier:
         return {
             "content_type": "tech_demo",  # Conservative default
             "deployment_maturity": "unknown",
-            "application_category": item.get("default_category", "industrial_automation"),
+            "application_category": item.get("default_category", "industrial"),
             "task_types": item.get("default_tasks", []),
             "specific_tasks": [],
             "functional_requirements": [],

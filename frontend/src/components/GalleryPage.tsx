@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Search, Plus, Factory, Bot, Shield } from 'lucide-react';
+import { Search, Plus, Factory, Bot, Home, Cross, AlertTriangle } from 'lucide-react';
 import type { GalleryItem, GalleryFilters, ApplicationCategory } from '../types/gallery';
 import { CATEGORY_INFO } from '../types/gallery';
 import { getGalleryItems, getGalleryStats } from '../services/gallery-service';
@@ -79,10 +79,17 @@ export default function GalleryPage({ filters, onFiltersChange }: GalleryPagePro
       </div>
 
       {/* Category Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         {(Object.entries(CATEGORY_INFO) as [ApplicationCategory, typeof CATEGORY_INFO[ApplicationCategory]][]).map(
           ([key, info]) => {
-            const Icon = key === 'industrial_automation' ? Factory : key === 'service_robotics' ? Bot : Shield;
+            const CATEGORY_ICONS: Record<string, typeof Factory> = {
+              industrial: Factory,
+              professional_service: Bot,
+              personal_service: Home,
+              medical: Cross,
+              specialized_environment: AlertTriangle,
+            };
+            const Icon = CATEGORY_ICONS[key] || Factory;
             const isActive = filters.category === key;
             const count = stats?.byCategory[key] || 0;
 

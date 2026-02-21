@@ -83,6 +83,7 @@ async def reclassify_batch(
         'tech_demo': 0,
         'product_announcement': 0,
         'tutorial': 0,
+        'interview_comment': 0,
         'unknown': 0,
         'errors': 0,
         'updated': 0,
@@ -157,6 +158,7 @@ async def main():
         'tech_demo': 0,
         'product_announcement': 0,
         'tutorial': 0,
+        'interview_comment': 0,
         'unknown': 0,
         'errors': 0,
         'updated': 0,
@@ -187,7 +189,8 @@ async def main():
     print("-"*40)
 
     content_types = ['real_application', 'pilot_poc', 'case_study', 'tech_demo',
-                     'product_announcement', 'tutorial', 'unknown']
+                     'product_announcement', 'tutorial', 'interview_comment',
+                     'unknown']
 
     for ct in content_types:
         count = total_stats.get(ct, 0)

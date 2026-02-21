@@ -296,7 +296,8 @@ class SupabaseClient:
             # V2: Count by content type
             content_type_stats = {}
             for ct in ["real_application", "pilot_poc", "case_study", "tech_demo",
-                       "product_announcement", "tutorial", "unknown"]:
+                       "product_announcement", "tutorial", "interview_comment",
+                       "unknown"]:
                 try:
                     result = self.client.table("application_gallery").select(
                         "id", count="exact"

@@ -28,8 +28,8 @@ Author: {author}
 
 Classify according to RSIP taxonomy:
 
-1. application_category: industrial_automation | service_robotics | surveillance_security
-2. content_type: real_application | pilot_poc | case_study | tech_demo | product_announcement | tutorial
+1. application_category: industrial | professional_service | personal_service | medical | specialized_environment
+2. content_type: real_application | pilot_poc | case_study | tech_demo | product_announcement | tutorial | interview_comment
 3. educational_value: 1-5 (5=detailed case study with metrics, 1=pure marketing/entertainment)
 4. task_types: Array of relevant tasks like transportation, inspection, manipulation, palletizing, welding, assembly, delivery_service, human_interaction, cleaning, perimeter_patrol, bin_picking, kitting, etc.
 5. scene_type: warehouse | manufacturing | retail | hospital | office | hotel | outdoor | laboratory
@@ -87,7 +87,7 @@ async def classify_content(item: SocialContent) -> dict:
     except Exception as e:
         print(f"  Classification error: {e}")
         return {
-            'application_category': 'industrial_automation',
+            'application_category': 'industrial',
             'content_type': 'tech_demo',
             'educational_value': 2,
             'task_types': [],
@@ -143,7 +143,7 @@ async def store_content(item: SocialContent, classification: dict) -> bool:
         'media_type': item.media_type,
         'thumbnail_url': item.thumbnail_url,
         'published_at': item.published_at,
-        'application_category': classification.get('application_category', 'industrial_automation'),
+        'application_category': classification.get('application_category', 'industrial'),
         'content_type': classification.get('content_type', 'tech_demo'),
         'educational_value': classification.get('educational_value', 2),
         'task_types': classification.get('task_types', []),

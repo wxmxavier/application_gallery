@@ -158,7 +158,7 @@ class Config:
             self.youtube_channels.append(YouTubeChannel(
                 id=ch["id"],
                 name=ch["name"],
-                default_category=ch.get("default_category", "industrial_automation"),
+                default_category=ch.get("default_category", "industrial"),
                 priority=ch.get("priority", 1),
             ))
 

@@ -1,4 +1,4 @@
-import { Sparkles, Factory, Bot, Shield, Warehouse, Building, Cross, ShoppingBag, Truck, Package, Eye, Wrench } from 'lucide-react';
+import { Sparkles, Factory, Bot, Home, Cross, Warehouse, Building, ShoppingBag, Truck, Package, Eye, Wrench } from 'lucide-react';
 
 export interface QuickFilter {
   id: string;
@@ -15,9 +15,10 @@ interface QuickDiscoverChipsProps {
 
 const QUICK_FILTERS: QuickFilter[] = [
   // Categories
-  { id: 'cat-industrial', label: 'Industrial', icon: <Factory className="w-4 h-4" />, type: 'category', value: 'industrial_automation' },
-  { id: 'cat-service', label: 'Service', icon: <Bot className="w-4 h-4" />, type: 'category', value: 'service_robotics' },
-  { id: 'cat-security', label: 'Security', icon: <Shield className="w-4 h-4" />, type: 'category', value: 'surveillance_security' },
+  { id: 'cat-industrial', label: 'Industrial', icon: <Factory className="w-4 h-4" />, type: 'category', value: 'industrial' },
+  { id: 'cat-professional', label: 'Professional', icon: <Bot className="w-4 h-4" />, type: 'category', value: 'professional_service' },
+  { id: 'cat-personal', label: 'Personal', icon: <Home className="w-4 h-4" />, type: 'category', value: 'personal_service' },
+  { id: 'cat-medical', label: 'Medical', icon: <Cross className="w-4 h-4" />, type: 'category', value: 'medical' },
   // Scenes
   { id: 'scene-warehouse', label: 'Warehouse', icon: <Warehouse className="w-4 h-4" />, type: 'scene', value: 'warehouse' },
   { id: 'scene-manufacturing', label: 'Manufacturing', icon: <Building className="w-4 h-4" />, type: 'scene', value: 'manufacturing' },

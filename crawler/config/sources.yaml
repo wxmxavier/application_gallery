@@ -17,150 +17,150 @@ youtube:
     # Industrial Arms & Automation
     - id: "UC7vVhkEfw4nOGp8TyDk7RcQ"
       name: "Boston Dynamics"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 1
 
     - id: "UCqGn1f0O7c4qAFbWjNxNS3A"
       name: "Universal Robots"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 1
 
     - id: "UCKuMrA1rMbHzMUqYwJNpKjA"
       name: "KUKA Robotics"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 1
 
     - id: "UCKBDWtJBRdVsLpVqJvGJl5g"
       name: "ABB Robotics"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 1
 
     - id: "UCx8rZl5Qo6BqNmJmRz1qW-w"
       name: "FANUC America"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 1
 
     - id: "UCRmAuo5vLgIjrVn4PcWzdkg"
       name: "Yaskawa Motoman"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 1
 
     - id: "UCn6Jc4LoNaZl4jH2t9fJHbQ"
       name: "Epson Robots"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 2
 
     - id: "UCvOu1rQr3Y5V1txyBG3kU0w"
       name: "Doosan Robotics"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 2
 
     # Mobile Robots & AMR
     - id: "UCN-StetwWuVYf-MU2_NVj4A"
       name: "Agility Robotics"
-      default_category: "service_robotics"
+      default_category: "professional_service"
       priority: 1
 
     - id: "UCFlG8JVvCVfhd7SM_gz-YIg"
       name: "Locus Robotics"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 1
 
     - id: "UCWcg2CPMjg3VfNGt7qLDG9Q"
       name: "6 River Systems"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 2
 
     - id: "UCvHpQNqB0AFDL9xL95wSePQ"
       name: "MiR - Mobile Industrial Robots"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 1
 
     - id: "UC4lTMWJH0C5xBGwTB0qeWGw"
       name: "Fetch Robotics"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 2
 
     - id: "UCYkOJE6e0YMB7EKMT8e0DNQ"
       name: "OTTO Motors"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 2
 
     # Service & Hospitality Robots
     - id: "UCc3dBExVfebL2OKZA9Z7DPA"
       name: "Bear Robotics"
-      default_category: "service_robotics"
+      default_category: "professional_service"
       priority: 1
 
     - id: "UCgOJMqLMF2rlQkL3kNr2Hlg"
       name: "Pudu Robotics"
-      default_category: "service_robotics"
+      default_category: "professional_service"
       priority: 1
 
     - id: "UCQy9i2zJL5AZxDgtLm7lNTQ"
       name: "Savioke"
-      default_category: "service_robotics"
+      default_category: "professional_service"
       priority: 2
 
     - id: "UCPgNQ6bHg7FZQdwl0EZZS8A"
       name: "Keenon Robotics"
-      default_category: "service_robotics"
+      default_category: "professional_service"
       priority: 2
 
     # Healthcare & Medical
     - id: "UCMpx-nQrNjT3O9Yrv8L1u6g"
       name: "Intuitive Surgical"
-      default_category: "service_robotics"
+      default_category: "professional_service"
       priority: 1
 
     - id: "UCY7x0hCXPn4wKjVYAVKxnNA"
       name: "Aethon (ST Engineering)"
-      default_category: "service_robotics"
+      default_category: "professional_service"
       priority: 2
 
     # Security & Inspection
     - id: "UCkRpGbDCpOQxLm0FHSGHe0g"
       name: "Knightscope"
-      default_category: "surveillance_security"
+      default_category: "professional_service"
       priority: 1
 
     - id: "UCT9w8FLYbmI8hEnX1gTWGIA"
       name: "ANYbotics"
-      default_category: "surveillance_security"
+      default_category: "professional_service"
       priority: 1
 
     # Research Labs & Universities
     - id: "UCsAb8mkFLLhlZNqJEaDjMdQ"
       name: "MIT CSAIL"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 2
 
     - id: "UCQ6UJOEJHxT3Mk0GbRPcrpA"
       name: "Stanford Robotics"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 2
 
     - id: "UCyks68O3S1nqb4jL5-xTxOg"
       name: "CMU Robotics Institute"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 2
 
     # Trade Shows & Industry News
     - id: "UCMhCnKpLM0BQ5gAYzL3k6Ew"
       name: "Automate Show"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 2
 
     - id: "UCbD1K9yCwm2j0V4qIB6Q3wQ"
       name: "RoboBusiness"
-      default_category: "industrial_automation"
+      default_category: "industrial"
       priority: 2
 
   # -------------------------------------------------------------------------
   # YouTube Search Queries (Broader Coverage)
   # -------------------------------------------------------------------------
   search_queries:
-    industrial_automation:
+    industrial:
       # Warehouse & Logistics
       - query: "warehouse robot automation real application"
         tasks: ["transportation"]
@@ -217,7 +217,7 @@ youtube:
       - query: "pick and place robot application"
         tasks: ["manipulation"]
 
-    service_robotics:
+    professional_service:
       # Hospital & Healthcare
       - query: "hospital delivery robot real deployment"
         tasks: ["delivery_service", "healthcare_assist"]
@@ -272,7 +272,7 @@ youtube:
       - query: "campus delivery robot university"
         tasks: ["delivery_service"]
 
-    surveillance_security:
+    professional_service_security:
       # Security Patrol
       - query: "security patrol robot building"
         tasks: ["perimeter_patrol"]
@@ -314,7 +314,7 @@ google_search:
   # News Search Queries
   # -------------------------------------------------------------------------
   news_queries:
-    industrial_automation:
+    industrial:
       - "warehouse automation robot deployment case study"
       - "manufacturing robot installation factory"
       - "logistics robot company warehouse"
@@ -324,7 +324,7 @@ google_search:
       - "industrial robot arm factory case study"
       - "automated warehouse system robot"
 
-    service_robotics:
+    professional_service:
       - "hospital robot deployment healthcare"
       - "hotel robot service implementation"
       - "restaurant robot waiter deployment"
@@ -334,7 +334,7 @@ google_search:
       - "airport robot service"
       - "healthcare robot case study"
 
-    surveillance_security:
+    professional_service_security:
       - "security robot patrol deployment"
       - "inspection robot industrial plant"
       - "autonomous robot surveillance"
@@ -344,7 +344,7 @@ google_search:
   # Image Search Queries
   # -------------------------------------------------------------------------
   image_queries:
-    industrial_automation:
+    industrial:
       - "warehouse robot AGV real deployment"
       - "industrial robot arm factory floor"
       - "collaborative robot manufacturing"
@@ -354,7 +354,7 @@ google_search:
       - "robot assembly line automotive"
       - "bin picking robot 3D vision"
 
-    service_robotics:
+    professional_service:
       - "hospital delivery robot corridor"
       - "hotel service robot lobby"
       - "restaurant robot waiter serving"
@@ -364,7 +364,7 @@ google_search:
       - "reception robot hotel"
       - "healthcare robot patient"
 
-    surveillance_security:
+    professional_service_security:
       - "security patrol robot building"
       - "inspection robot industrial facility"
       - "autonomous robot data center"
@@ -436,7 +436,7 @@ news_rss:
 # =============================================================================
 
 company_websites:
-  industrial_automation:
+  industrial:
     - name: "Boston Dynamics"
       base_url: "https://bostondynamics.com"
       paths: ["/solutions", "/resources/case-studies"]
@@ -477,7 +477,7 @@ company_websites:
       paths: ["/resources/case-studies"]
       priority: 2
 
-  service_robotics:
+  professional_service:
     - name: "Bear Robotics"
       base_url: "https://www.bearrobotics.ai"
       paths: ["/case-studies", "/customers"]
@@ -503,7 +503,7 @@ company_websites:
       paths: ["/business"]
       priority: 2
 
-  surveillance_security:
+  professional_service_security:
     - name: "Knightscope"
       base_url: "https://www.knightscope.com"
       paths: ["/case-studies"]

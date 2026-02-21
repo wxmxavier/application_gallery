@@ -23,9 +23,11 @@ export type DeploymentMaturity =
   | 'unknown';
 
 export type ApplicationCategory =
-  | 'industrial_automation'
-  | 'service_robotics'
-  | 'surveillance_security';
+  | 'industrial'
+  | 'professional_service'
+  | 'personal_service'
+  | 'medical'
+  | 'specialized_environment';
 
 export type MediaType = 'video' | 'image' | 'photo' | 'article' | 'case_study' | 'gallery';
 
@@ -238,23 +240,35 @@ export const CATEGORY_INFO: Record<ApplicationCategory, {
   icon: string;
   color: string;
 }> = {
-  industrial_automation: {
-    label: 'Industrial Automation',
-    labelZh: '工业自动化',
+  industrial: {
+    label: 'Industrial',
+    labelZh: '工业',
     icon: '🏭',
     color: 'bg-blue-100 text-blue-800',
   },
-  service_robotics: {
-    label: 'Service Robotics',
-    labelZh: '服务机器人',
+  professional_service: {
+    label: 'Professional Service',
+    labelZh: '专业服务',
     icon: '🤖',
     color: 'bg-green-100 text-green-800',
   },
-  surveillance_security: {
-    label: 'Security & Surveillance',
-    labelZh: '安防监控',
-    icon: '🛡️',
+  personal_service: {
+    label: 'Personal Service',
+    labelZh: '个人服务',
+    icon: '🏠',
+    color: 'bg-purple-100 text-purple-800',
+  },
+  medical: {
+    label: 'Medical',
+    labelZh: '医疗',
+    icon: '🏥',
     color: 'bg-red-100 text-red-800',
+  },
+  specialized_environment: {
+    label: 'Specialized',
+    labelZh: '特殊环境',
+    icon: '⚠️',
+    color: 'bg-amber-100 text-amber-800',
   },
 };
 
@@ -283,55 +297,55 @@ export const SPECIFIC_TASK_INFO: Record<string, {
   category: ApplicationCategory;
 }> = {
   // Industrial - Transport
-  pallet_transport: { label: 'Pallet Transport', labelZh: '托盘搬运', category: 'industrial_automation' },
-  tote_transport: { label: 'Tote Transport', labelZh: '料箱搬运', category: 'industrial_automation' },
-  cart_towing: { label: 'Cart Towing', labelZh: '拖车牵引', category: 'industrial_automation' },
-  dock_to_stock: { label: 'Dock to Stock', labelZh: '卸货入库', category: 'industrial_automation' },
-  material_handling: { label: 'Material Handling', labelZh: '物料搬运', category: 'industrial_automation' },
+  pallet_transport: { label: 'Pallet Transport', labelZh: '托盘搬运', category: 'industrial' },
+  tote_transport: { label: 'Tote Transport', labelZh: '料箱搬运', category: 'industrial' },
+  cart_towing: { label: 'Cart Towing', labelZh: '拖车牵引', category: 'industrial' },
+  dock_to_stock: { label: 'Dock to Stock', labelZh: '卸货入库', category: 'industrial' },
+  material_handling: { label: 'Material Handling', labelZh: '物料搬运', category: 'industrial' },
 
   // Industrial - Manipulation
-  machine_tending: { label: 'Machine Tending', labelZh: '机床上下料', category: 'industrial_automation' },
-  assembly_insertion: { label: 'Assembly Insertion', labelZh: '装配插入', category: 'industrial_automation' },
-  screw_driving: { label: 'Screw Driving', labelZh: '螺丝拧紧', category: 'industrial_automation' },
-  bin_picking: { label: 'Bin Picking', labelZh: '料箱拣选', category: 'industrial_automation' },
-  kitting: { label: 'Kitting', labelZh: '配套组装', category: 'industrial_automation' },
-  welding: { label: 'Welding', labelZh: '焊接', category: 'industrial_automation' },
-  painting: { label: 'Painting', labelZh: '喷涂', category: 'industrial_automation' },
+  machine_tending: { label: 'Machine Tending', labelZh: '机床上下料', category: 'industrial' },
+  assembly_insertion: { label: 'Assembly Insertion', labelZh: '装配插入', category: 'industrial' },
+  screw_driving: { label: 'Screw Driving', labelZh: '螺丝拧紧', category: 'industrial' },
+  bin_picking: { label: 'Bin Picking', labelZh: '料箱拣选', category: 'industrial' },
+  kitting: { label: 'Kitting', labelZh: '配套组装', category: 'industrial' },
+  welding: { label: 'Welding', labelZh: '焊接', category: 'industrial' },
+  painting: { label: 'Painting', labelZh: '喷涂', category: 'industrial' },
 
   // Industrial - Palletizing
-  case_palletizing: { label: 'Case Palletizing', labelZh: '箱子码垛', category: 'industrial_automation' },
-  depalletizing: { label: 'Depalletizing', labelZh: '拆垛', category: 'industrial_automation' },
+  case_palletizing: { label: 'Case Palletizing', labelZh: '箱子码垛', category: 'industrial' },
+  depalletizing: { label: 'Depalletizing', labelZh: '拆垛', category: 'industrial' },
 
   // Industrial - Inspection
-  visual_inspection: { label: 'Visual Inspection', labelZh: '视觉检测', category: 'industrial_automation' },
-  weld_inspection: { label: 'Weld Inspection', labelZh: '焊缝检测', category: 'industrial_automation' },
-  quality_control: { label: 'Quality Control', labelZh: '质量控制', category: 'industrial_automation' },
+  visual_inspection: { label: 'Visual Inspection', labelZh: '视觉检测', category: 'industrial' },
+  weld_inspection: { label: 'Weld Inspection', labelZh: '焊缝检测', category: 'industrial' },
+  quality_control: { label: 'Quality Control', labelZh: '质量控制', category: 'industrial' },
 
   // Service - Delivery
-  room_delivery: { label: 'Room Delivery', labelZh: '客房配送', category: 'service_robotics' },
-  medication_delivery: { label: 'Medication Delivery', labelZh: '药品配送', category: 'service_robotics' },
-  food_delivery: { label: 'Food Delivery', labelZh: '餐饮配送', category: 'service_robotics' },
+  room_delivery: { label: 'Room Delivery', labelZh: '客房配送', category: 'professional_service' },
+  medication_delivery: { label: 'Medication Delivery', labelZh: '药品配送', category: 'professional_service' },
+  food_delivery: { label: 'Food Delivery', labelZh: '餐饮配送', category: 'professional_service' },
 
   // Service - Cleaning
-  floor_scrubbing: { label: 'Floor Scrubbing', labelZh: '地面清洗', category: 'service_robotics' },
-  vacuum_cleaning: { label: 'Vacuum Cleaning', labelZh: '吸尘清洁', category: 'service_robotics' },
-  disinfection: { label: 'Disinfection', labelZh: '消毒杀菌', category: 'service_robotics' },
+  floor_scrubbing: { label: 'Floor Scrubbing', labelZh: '地面清洗', category: 'professional_service' },
+  vacuum_cleaning: { label: 'Vacuum Cleaning', labelZh: '吸尘清洁', category: 'professional_service' },
+  disinfection: { label: 'Disinfection', labelZh: '消毒杀菌', category: 'professional_service' },
 
   // Service - Interaction
-  reception_greeting: { label: 'Reception', labelZh: '接待迎宾', category: 'service_robotics' },
-  wayfinding: { label: 'Wayfinding', labelZh: '导航引导', category: 'service_robotics' },
-  telepresence: { label: 'Telepresence', labelZh: '远程呈现', category: 'service_robotics' },
-  inventory_scanning: { label: 'Inventory Scanning', labelZh: '库存盘点', category: 'service_robotics' },
-  companion: { label: 'Companion', labelZh: '陪伴', category: 'service_robotics' },
-  concierge: { label: 'Concierge', labelZh: '礼宾服务', category: 'service_robotics' },
+  reception_greeting: { label: 'Reception', labelZh: '接待迎宾', category: 'professional_service' },
+  wayfinding: { label: 'Wayfinding', labelZh: '导航引导', category: 'professional_service' },
+  telepresence: { label: 'Telepresence', labelZh: '远程呈现', category: 'professional_service' },
+  inventory_scanning: { label: 'Inventory Scanning', labelZh: '库存盘点', category: 'professional_service' },
+  companion: { label: 'Companion', labelZh: '陪伴', category: 'professional_service' },
+  concierge: { label: 'Concierge', labelZh: '礼宾服务', category: 'professional_service' },
 
   // Security
-  perimeter_patrol: { label: 'Perimeter Patrol', labelZh: '周界巡逻', category: 'surveillance_security' },
-  intrusion_detection: { label: 'Intrusion Detection', labelZh: '入侵检测', category: 'surveillance_security' },
-  access_verification: { label: 'Access Verification', labelZh: '门禁验证', category: 'surveillance_security' },
-  remote_monitoring: { label: 'Remote Monitoring', labelZh: '远程监控', category: 'surveillance_security' },
-  threat_detection: { label: 'Threat Detection', labelZh: '威胁检测', category: 'surveillance_security' },
-  facility_inspection: { label: 'Facility Inspection', labelZh: '设施巡检', category: 'surveillance_security' },
+  perimeter_patrol: { label: 'Perimeter Patrol', labelZh: '周界巡逻', category: 'professional_service' },
+  intrusion_detection: { label: 'Intrusion Detection', labelZh: '入侵检测', category: 'professional_service' },
+  access_verification: { label: 'Access Verification', labelZh: '门禁验证', category: 'professional_service' },
+  remote_monitoring: { label: 'Remote Monitoring', labelZh: '远程监控', category: 'professional_service' },
+  threat_detection: { label: 'Threat Detection', labelZh: '威胁检测', category: 'professional_service' },
+  facility_inspection: { label: 'Facility Inspection', labelZh: '设施巡检', category: 'professional_service' },
 };
 
 // Helper: Get default filters (show quality content only)

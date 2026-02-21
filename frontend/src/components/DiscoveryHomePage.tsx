@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Search, X, Factory, Bot, Shield, ChevronRight, Play, FileText, ArrowUpDown, Clock, TrendingUp, Calendar, Eye, ExternalLink, ToggleLeft, ToggleRight, MapPin, Wrench } from 'lucide-react';
+import { Search, X, Factory, Bot, Home, Cross, AlertTriangle, ChevronRight, Play, FileText, ArrowUpDown, Clock, TrendingUp, Calendar, Eye, ExternalLink, ToggleLeft, ToggleRight, MapPin, Wrench } from 'lucide-react';
 import type { GalleryItem, GalleryFilters, ApplicationCategory } from '../types/gallery';
 import { CATEGORY_INFO, CONTENT_TYPE_INFO, EDUCATIONAL_VALUE_INFO, SCENE_INFO } from '../types/gallery';
 import { getGalleryItems, getFeaturedItems, SortOption } from '../services/gallery-service';
@@ -17,9 +17,11 @@ interface DiscoveryHomePageProps {
 type ViewMode = 'visual' | 'articles';
 
 const CATEGORIES: { id: ApplicationCategory; icon: typeof Factory; color: string }[] = [
-  { id: 'industrial_automation', icon: Factory, color: 'bg-blue-500' },
-  { id: 'service_robotics', icon: Bot, color: 'bg-green-500' },
-  { id: 'surveillance_security', icon: Shield, color: 'bg-red-500' },
+  { id: 'industrial', icon: Factory, color: 'bg-blue-500' },
+  { id: 'professional_service', icon: Bot, color: 'bg-green-500' },
+  { id: 'personal_service', icon: Home, color: 'bg-purple-500' },
+  { id: 'medical', icon: Cross, color: 'bg-red-500' },
+  { id: 'specialized_environment', icon: AlertTriangle, color: 'bg-amber-500' },
 ];
 
 // Top scene types for filtering

@@ -39,6 +39,7 @@ const CONTENT_TYPE_COLORS: Record<string, string> = {
   tech_demo: 'border-l-orange-400',
   product_announcement: 'border-l-pink-400',
   tutorial: 'border-l-cyan-500',
+  interview_comment: 'border-l-orange-400',
 };
 
 function GridCard({ item, onClick }: GridCardProps) {

@@ -267,7 +267,7 @@ export async function getFilterOptions(): Promise<FilterOptions> {
 
 function getDefaultFilterOptions(): FilterOptions {
   return {
-    categories: ['industrial_automation', 'service_robotics', 'surveillance_security'],
+    categories: ['industrial', 'professional_service', 'personal_service', 'medical', 'specialized_environment'],
     content_types: ['real_application', 'pilot_poc', 'case_study', 'tech_demo', 'product_announcement', 'tutorial'],
     scene_types: [],
     task_types: [],
@@ -323,9 +323,11 @@ export async function getGalleryStats(): Promise<{
 
     // Get counts by category
     const categories: ApplicationCategory[] = [
-      'industrial_automation',
-      'service_robotics',
-      'surveillance_security',
+      'industrial',
+      'professional_service',
+      'personal_service',
+      'medical',
+      'specialized_environment',
     ];
 
     const byCategory: Record<ApplicationCategory, number> = {} as Record<ApplicationCategory, number>;
@@ -348,6 +350,7 @@ export async function getGalleryStats(): Promise<{
       'tech_demo',
       'product_announcement',
       'tutorial',
+      'interview_comment',
       'unknown',
     ];
 
@@ -393,9 +396,11 @@ export async function getGalleryStats(): Promise<{
     return {
       total: 0,
       byCategory: {
-        industrial_automation: 0,
-        service_robotics: 0,
-        surveillance_security: 0,
+        industrial: 0,
+        professional_service: 0,
+        personal_service: 0,
+        medical: 0,
+        specialized_environment: 0,
       },
       byContentType: {
         real_application: 0,
