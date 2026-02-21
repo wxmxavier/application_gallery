@@ -29,15 +29,16 @@ Classify according to RSIP taxonomy:
 1. application_category: industrial | professional_service | personal_service | medical | specialized_environment
 2. content_type: real_application | pilot_poc | case_study | tech_demo | product_announcement | tutorial | interview_comment
 3. educational_value: 1-5 (5=detailed case study, 1=entertainment only)
-4. task_types: Array like transportation, inspection, manipulation, palletizing, welding, assembly, delivery_service, human_interaction, cleaning, perimeter_patrol
+4. task_types: Array like transportation, inspection, manipulation, palletizing, welding, assembly, delivery_service, human_interaction, cleaning, perimeter_patrol, healthcare_assist, locomotion, entertainment
 5. scene_type: warehouse | manufacturing | retail | hospital | office | hotel | outdoor | laboratory
 6. ai_summary: One sentence summary
 
 IMPORTANT for TikTok:
 - Most TikTok videos are tech_demo or tutorial
-- Dancing/entertainment robots = tech_demo, educational_value: 1-2
+- Dancing/entertainment robots = tech_demo, educational_value: 1-2, task_types: ["locomotion"] or ["entertainment"]
 - Factory tours showing real operations = real_application
 - Product showcases = product_announcement
+- Do NOT assign industrial tasks (transportation, palletizing) to entertainment/demo content
 
 Respond with JSON only:
 {{

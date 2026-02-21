@@ -130,7 +130,10 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
               <span className="whitespace-nowrap">{new Date(item.published_at).toLocaleDateString()}</span>
             </>
           )}
-          <div className="ml-auto" onClick={(e) => e.stopPropagation()}>
+          <span className="ml-auto font-mono text-[10px] text-gray-300 select-all" title={`ID: ${item.id}`}>
+            #{item.id.slice(0, 8)}
+          </span>
+          <div onClick={(e) => e.stopPropagation()}>
             <ReportButton
               itemId={item.id}
               itemTitle={item.title}

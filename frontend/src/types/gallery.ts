@@ -365,6 +365,17 @@ export const SPECIFIC_TASK_INFO: Record<string, {
   space_operation: { label: 'Space Operation', labelZh: '太空作业', category: 'specialized_environment' },
   nuclear_decommission: { label: 'Nuclear Decommission', labelZh: '核退役', category: 'specialized_environment' },
   firefighting: { label: 'Firefighting', labelZh: '消防', category: 'specialized_environment' },
+
+  // Personal Service
+  home_cleaning: { label: 'Home Cleaning', labelZh: '家庭清洁', category: 'personal_service' },
+  lawn_mowing: { label: 'Lawn Mowing', labelZh: '草坪修剪', category: 'personal_service' },
+  entertainment: { label: 'Entertainment', labelZh: '娱乐表演', category: 'personal_service' },
+  personal_assistant: { label: 'Personal Assistant', labelZh: '个人助理', category: 'personal_service' },
+
+  // Cross-category
+  locomotion_demo: { label: 'Locomotion Demo', labelZh: '运动演示', category: 'industrial' },
+  general_demo: { label: 'General Demo', labelZh: '综合演示', category: 'industrial' },
+  research_platform: { label: 'Research Platform', labelZh: '研究平台', category: 'industrial' },
 };
 
 // Helper: Get default filters (show quality content only)

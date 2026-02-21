@@ -103,6 +103,9 @@ export default function GalleryDetailModal({ item, onClose }: GalleryDetailModal
             <h2 className="text-xl font-semibold text-gray-900 line-clamp-2">
               {item.title}
             </h2>
+            <span className="font-mono text-xs text-gray-400 select-all" title={`Full ID: ${item.id}`}>
+              ID: {item.id.slice(0, 8)}
+            </span>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <ReportButton

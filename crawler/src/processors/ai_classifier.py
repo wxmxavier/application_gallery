@@ -34,6 +34,7 @@ CLASSIFICATION TASKS:
    - tech_demo: Capability demonstration, trade show, lab demo, controlled environment
    - product_announcement: New product reveal, features showcase
    - tutorial: How-to, integration guide, training content
+   - interview_comment: Interview, commentary, reaction, opinion piece about robots
 
    INDICATORS for real_application:
    - Named customer or facility
@@ -70,9 +71,11 @@ CLASSIFICATION TASKS:
               machine_tending, assembly_insertion, case_palletizing, depalletizing,
               visual_inspection, weld_inspection, screw_driving, material_handling,
               bin_picking, kitting, quality_control, packaging, welding, painting
-   Service: room_delivery, medication_delivery, food_delivery, floor_scrubbing,
-           vacuum_cleaning, disinfection, reception_greeting, wayfinding,
-           telepresence, inventory_scanning, companion, concierge
+   Professional Service: room_delivery, medication_delivery, food_delivery,
+              floor_scrubbing, vacuum_cleaning, disinfection, reception_greeting,
+              wayfinding, telepresence, inventory_scanning, concierge
+   Personal Service: companion, home_cleaning, lawn_mowing, entertainment,
+              personal_assistant
    Security: perimeter_patrol, intrusion_detection, access_verification,
             remote_monitoring, threat_detection, facility_inspection
    Medical: surgical_procedure, rehabilitation_therapy, pharmacy_dispensing,
@@ -80,6 +83,8 @@ CLASSIFICATION TASKS:
            patient_monitoring, sterilization
    Specialized: hazardous_inspection, bomb_disposal, underwater_operation,
                space_operation, nuclear_decommission, firefighting
+   Cross-category (use when no specific task fits):
+              locomotion_demo, general_demo, research_platform
 
 5. SCENE_TYPE: warehouse, manufacturing, retail, hospital, office, hotel,
                outdoor, laboratory, construction, logistics_center, airport,
@@ -112,28 +117,28 @@ CLASSIFICATION TASKS:
 
 Return ONLY valid JSON (no markdown):
 {{
-  "content_type": "real_application",
+  "content_type": "case_study",
   "deployment_maturity": "production",
   "application_category": "industrial",
-  "specific_tasks": ["pallet_transport", "dock_to_stock"],
-  "task_types": ["transportation"],
-  "scene_type": "warehouse",
+  "specific_tasks": ["machine_tending", "bin_picking"],
+  "task_types": ["manipulation"],
+  "scene_type": "manufacturing",
   "application_context": {{
     "problem_solved": "labor_shortage",
-    "deployment_scale": "large_fleet",
+    "deployment_scale": "small_fleet",
     "customer_identified": true,
     "has_metrics": true
   }},
   "educational_value": 4,
-  "functional_requirements": ["autonomous_navigation", "fleet_management", "wms_integration"],
+  "functional_requirements": ["pick_and_place", "vision_guided", "collaborative"],
   "environment": {{
     "setting": "indoor",
     "human_presence": "collaborative",
     "floor_type": "smooth",
     "lighting": "artificial"
   }},
-  "summary": "Fleet of 50 AMRs handling pallet transport at BMW Leipzig plant, integrated with WMS for 24/7 operation",
-  "relevance_score": 0.95
+  "summary": "Cobot cell performing machine tending at XYZ Automotive, reducing cycle time by 30%",
+  "relevance_score": 0.9
 }}
 
 CRITICAL RULES:
@@ -141,10 +146,14 @@ CRITICAL RULES:
 - real_application requires EVIDENCE of actual business deployment
 - Trade show demos are ALWAYS tech_demo, even if impressive
 - Lab/showroom/studio environments = tech_demo
-- Robot dancing/doing tricks = tech_demo with educational_value 1
+- Robot dancing/doing tricks = tech_demo with specific_tasks ["locomotion_demo"] and educational_value 1
+- Entertainment content (costumes, performances, stunts) = tech_demo + personal_service + ["entertainment"]
+- Interviews, reactions, commentary = interview_comment
 - If uncertain between real_application and tech_demo, choose tech_demo
 - Relevance score should reflect practical value for someone planning a deployment
 - educational_value 4-5 requires real deployment evidence
+- Do NOT assign industrial tasks (pallet_transport, material_handling) to entertainment/demo videos
+- Use locomotion_demo for walking/running/agility demos, general_demo for unspecific capability shows
 """
 
 
@@ -176,7 +185,9 @@ class RSIPClassifier:
             "transportation", "inspection", "manipulation", "palletizing", "welding",
             "assembly", "quality_control", "packaging", "delivery_service",
             "human_interaction", "healthcare_assist", "cleaning", "reception",
-            "perimeter_patrol", "threat_detection", "access_monitoring"
+            "perimeter_patrol", "threat_detection", "access_monitoring",
+            # New broad types
+            "entertainment", "locomotion", "research",
         ]
         self.valid_specific_tasks = [
             # Industrial specific
@@ -184,13 +195,25 @@ class RSIPClassifier:
             "machine_tending", "assembly_insertion", "case_palletizing", "depalletizing",
             "visual_inspection", "weld_inspection", "screw_driving", "material_handling",
             "bin_picking", "kitting", "quality_control", "packaging", "welding", "painting",
-            # Service specific
+            # Professional service specific
             "room_delivery", "medication_delivery", "food_delivery", "floor_scrubbing",
             "vacuum_cleaning", "disinfection", "reception_greeting", "wayfinding",
-            "telepresence", "inventory_scanning", "companion", "concierge",
+            "telepresence", "inventory_scanning", "concierge",
+            # Personal service specific
+            "companion", "home_cleaning", "lawn_mowing", "entertainment",
+            "personal_assistant",
             # Security specific
             "perimeter_patrol", "intrusion_detection", "access_verification",
-            "remote_monitoring", "threat_detection", "facility_inspection"
+            "remote_monitoring", "threat_detection", "facility_inspection",
+            # Medical specific
+            "surgical_procedure", "rehabilitation_therapy", "pharmacy_dispensing",
+            "lab_automation", "sample_handling", "cell_therapy", "diagnostic_imaging",
+            "patient_monitoring", "sterilization",
+            # Specialized environment
+            "hazardous_inspection", "bomb_disposal", "underwater_operation",
+            "space_operation", "nuclear_decommission", "firefighting",
+            # Cross-category
+            "locomotion_demo", "general_demo", "research_platform",
         ]
         self.valid_scene_types = [
             "warehouse", "manufacturing", "retail", "hospital", "office",
@@ -348,7 +371,7 @@ class RSIPClassifier:
             "tote_transport": "transportation",
             "cart_towing": "transportation",
             "dock_to_stock": "transportation",
-            "material_handling": "transportation",
+            "material_handling": "manipulation",
             # Industrial manipulation
             "machine_tending": "manipulation",
             "assembly_insertion": "assembly",
@@ -401,6 +424,15 @@ class RSIPClassifier:
             "space_operation": "inspection",
             "nuclear_decommission": "inspection",
             "firefighting": "threat_detection",
+            # Personal service
+            "home_cleaning": "cleaning",
+            "lawn_mowing": "manipulation",
+            "entertainment": "entertainment",
+            "personal_assistant": "human_interaction",
+            # Cross-category
+            "locomotion_demo": "locomotion",
+            "general_demo": "entertainment",
+            "research_platform": "research",
         }
 
         broad_tasks = set()

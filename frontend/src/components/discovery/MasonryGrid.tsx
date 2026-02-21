@@ -162,10 +162,10 @@ function GridCard({ item, onClick }: GridCardProps) {
           )}
         </div>
 
-        {/* Task Tags - show only on hover or if few items */}
-        {item.task_types.length > 0 && (
+        {/* Task Tags - prefer specific_tasks, fallback to task_types */}
+        {(item.specific_tasks?.length > 0 || item.task_types.length > 0) && (
           <div className="flex flex-wrap gap-1 mb-2">
-            {item.task_types.slice(0, 2).map((task) => (
+            {(item.specific_tasks?.length > 0 ? item.specific_tasks : item.task_types).slice(0, 2).map((task) => (
               <span
                 key={task}
                 className="px-1.5 py-0.5 text-xs bg-blue-50 text-blue-600 rounded"
@@ -173,31 +173,36 @@ function GridCard({ item, onClick }: GridCardProps) {
                 {task.replace(/_/g, ' ')}
               </span>
             ))}
-            {item.task_types.length > 2 && (
+            {(item.specific_tasks?.length > 0 ? item.specific_tasks : item.task_types).length > 2 && (
               <span className="px-1.5 py-0.5 text-xs bg-gray-50 text-gray-500 rounded">
-                +{item.task_types.length - 2}
+                +{(item.specific_tasks?.length > 0 ? item.specific_tasks : item.task_types).length - 2}
               </span>
             )}
           </div>
         )}
 
-        {/* Source & Date - clickable link */}
-        <a
-          href={item.source_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
-          className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-blue-600 transition-colors group"
-        >
-          <ExternalLink className="w-3 h-3 flex-shrink-0" />
-          <span className="truncate">{item.source_name}</span>
+        {/* Source & Date */}
+        <div className="flex items-center gap-1.5 text-xs text-gray-400">
+          <a
+            href={item.source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1.5 hover:text-blue-600 transition-colors truncate"
+          >
+            <ExternalLink className="w-3 h-3 flex-shrink-0" />
+            <span className="truncate">{item.source_name}</span>
+          </a>
           {item.published_at && (
             <>
               <span>•</span>
               <span className="flex-shrink-0">{formatRelativeDate(item.published_at)}</span>
             </>
           )}
-        </a>
+          <span className="ml-auto font-mono text-[10px] text-gray-300 select-all flex-shrink-0" title={`ID: ${item.id}`}>
+            #{item.id.slice(0, 8)}
+          </span>
+        </div>
       </div>
     </div>
   );

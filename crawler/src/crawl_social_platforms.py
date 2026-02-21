@@ -31,7 +31,7 @@ Classify according to RSIP taxonomy:
 1. application_category: industrial | professional_service | personal_service | medical | specialized_environment
 2. content_type: real_application | pilot_poc | case_study | tech_demo | product_announcement | tutorial | interview_comment
 3. educational_value: 1-5 (5=detailed case study with metrics, 1=pure marketing/entertainment)
-4. task_types: Array of relevant tasks like transportation, inspection, manipulation, palletizing, welding, assembly, delivery_service, human_interaction, cleaning, perimeter_patrol, bin_picking, kitting, etc.
+4. task_types: Array of relevant tasks like transportation, inspection, manipulation, palletizing, welding, assembly, delivery_service, human_interaction, cleaning, perimeter_patrol, bin_picking, kitting, healthcare_assist, locomotion, entertainment, etc.
 5. scene_type: warehouse | manufacturing | retail | hospital | office | hotel | outdoor | laboratory
 6. ai_summary: One sentence summary of what this content shows
 
@@ -41,8 +41,9 @@ IMPORTANT CLASSIFICATION RULES:
 - tech_demo: Capability demonstrations, trade shows, lab footage, viral videos
 - real_application: ONLY if clearly showing actual customer deployment
 - case_study: Must show results, metrics, or detailed implementation
-- Videos of robots dancing, doing stunts = tech_demo (educational_value: 1-2)
+- Videos of robots dancing, doing stunts = tech_demo (educational_value: 1-2, task_types: ["locomotion"] or ["entertainment"])
 - Factory/warehouse deployment footage with context = real_application
+- Do NOT assign industrial tasks (transportation, palletizing) to entertainment/demo content
 
 Respond with JSON only:
 {{
