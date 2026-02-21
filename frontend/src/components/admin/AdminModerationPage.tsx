@@ -1,15 +1,17 @@
 // Admin Moderation Dashboard
 import { useState, useEffect } from 'react';
-import { ArrowLeft, LayoutGrid, Flag, BarChart3 } from 'lucide-react';
+import { ArrowLeft, LayoutGrid, Flag, BarChart3, Database, PlusCircle } from 'lucide-react';
 import ContentQueue from './ContentQueue';
 import ReportsQueue from './ReportsQueue';
+import BrowseContent from './BrowseContent';
+import AddContentByUrl from './AddContentByUrl';
 import { getModerationStats } from '../../services/moderation-service';
 import type { ModerationStats } from '../../types/moderation';
 
-type TabType = 'content' | 'reports';
+type TabType = 'content' | 'reports' | 'browse' | 'add';
 
 export default function AdminModerationPage() {
-  const [activeTab, setActiveTab] = useState<TabType>('content');
+  const [activeTab, setActiveTab] = useState<TabType>('browse');
   const [stats, setStats] = useState<ModerationStats>({
     pendingContent: 0,
     pendingReports: 0,
@@ -91,12 +93,19 @@ export default function AdminModerationPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex gap-1">
             <TabButton
+              active={activeTab === 'browse'}
+              onClick={() => setActiveTab('browse')}
+            >
+              <Database className="w-4 h-4" />
+              Browse Content
+            </TabButton>
+            <TabButton
               active={activeTab === 'content'}
               onClick={() => setActiveTab('content')}
               badge={stats.pendingContent}
             >
               <LayoutGrid className="w-4 h-4" />
-              Content Queue
+              Moderation Queue
             </TabButton>
             <TabButton
               active={activeTab === 'reports'}
@@ -104,7 +113,14 @@ export default function AdminModerationPage() {
               badge={stats.pendingReports}
             >
               <Flag className="w-4 h-4" />
-              Reports Queue
+              Reports
+            </TabButton>
+            <TabButton
+              active={activeTab === 'add'}
+              onClick={() => setActiveTab('add')}
+            >
+              <PlusCircle className="w-4 h-4" />
+              Add Content
             </TabButton>
           </div>
         </div>
@@ -112,11 +128,10 @@ export default function AdminModerationPage() {
 
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 py-6">
-        {activeTab === 'content' ? (
-          <ContentQueue onUpdate={loadStats} />
-        ) : (
-          <ReportsQueue onUpdate={loadStats} />
-        )}
+        {activeTab === 'browse' && <BrowseContent />}
+        {activeTab === 'content' && <ContentQueue onUpdate={loadStats} />}
+        {activeTab === 'reports' && <ReportsQueue onUpdate={loadStats} />}
+        {activeTab === 'add' && <AddContentByUrl />}
       </main>
     </div>
   );

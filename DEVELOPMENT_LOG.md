@@ -1383,5 +1383,173 @@ b23277a Add social media crawlers and interview_comment content type
 
 ---
 
+## Session 9: 2026-02-21 - Taxonomy Alignment & Classification Quality Overhaul
+
+### Overview
+
+Major session addressing taxonomy alignment with RSIP Knowledge Graph, classification quality issues, and gallery usability improvements.
+
+### Phase 1: KG Axis 1 Taxonomy Alignment
+
+**Problem:** Video Library used 3 categories (`industrial_automation`, `service_robotics`, `surveillance_security`) while KG Axis 1 defines 5 (`industrial`, `professional_service`, `personal_service`, `medical`, `specialized_environment`).
+
+**Migrations Created:**
+- `093_fix_content_type_unknown.sql` — Fix content_type CHECK constraint (add `unknown`, `interview_comment`)
+- `094_expand_application_categories.sql` — Expand from 3 to 5 categories + migrate existing data
+
+**Files Modified (12):**
+| File | Changes |
+|------|---------|
+| `crawler/src/processors/ai_classifier.py` | Categories 3→5, updated prompt, added medical/specialized tasks |
+| `crawler/src/storage/supabase_client.py` | Added interview_comment to stats |
+| `crawler/src/reclassify_existing.py` | Added --category filter, category tracking in stats/reports |
+| `crawler/config/sources.yaml` | All default_category + section keys updated |
+| `frontend/src/types/gallery.ts` | ApplicationCategory, CATEGORY_INFO, SPECIFIC_TASK_INFO |
+| `frontend/src/services/gallery-service.ts` | Category arrays, stats, fallbacks |
+| `frontend/src/components/discovery/QuickDiscoverChips.tsx` | Category filter chips |
+| `frontend/src/components/discovery/MasonryGrid.tsx` | interview_comment border color |
+| `frontend/src/components/DiscoveryHomePage.tsx` | CATEGORIES constant, icon logic |
+| `frontend/src/components/GalleryPage.tsx` | Icon selection logic |
+
+**Reclassification Results (1000 items):**
+| Category | Count | % |
+|----------|-------|---|
+| industrial | 766 | 76.6% |
+| professional_service | 137 | 13.7% |
+| personal_service | 39 | 3.9% |
+| medical | 37 | 3.7% |
+| specialized_environment | 21 | 2.1% |
+
+**Commits:** `577e9ed`, `8c852fb`
+
+### Phase 2: Medical & Specialized Task Vocabulary
+
+**Problem:** AI classifier had no medical/specialized task options. Multiply Labs cell therapy video was tagged as "packaging"/"transportation".
+
+**Solution:** Added 15 new specific tasks to classifier prompt, validation, mapping, and frontend:
+
+| Category | New Tasks |
+|----------|-----------|
+| Medical (9) | surgical_procedure, rehabilitation_therapy, pharmacy_dispensing, lab_automation, sample_handling, cell_therapy, diagnostic_imaging, patient_monitoring, sterilization |
+| Specialized (6) | hazardous_inspection, bomb_disposal, underwater_operation, space_operation, nuclear_decommission, firefighting |
+
+**Verification:** Tasks are orthogonal to 7-axis taxonomy (only Axis 1 applies to video classification). TAXONOMY_IMPLEMENTATION_VIDEO_LIBRARY.md explicitly states task alignment with RSIP's 99 tasks is unnecessary.
+
+**Targeted reclassification:** 58 medical+specialized items → 6 reassigned, 52 stayed with corrected task labels.
+
+**Commit:** `40d23b7`
+
+### Phase 3: Transportation Mislabeling Fix
+
+**Root Causes Identified:**
+1. `material_handling` mapped to "transportation" but is actually manipulation
+2. No `locomotion_demo`, `general_demo`, `entertainment` task types for demo content
+3. Prompt JSON example anchored on "transportation" (bias)
+4. No Personal Service task section in prompt
+5. Standalone crawler scripts had limited task vocabulary
+
+**Fixes Applied:**
+| Fix | Detail |
+|-----|--------|
+| `material_handling` mapping | `transportation` → `manipulation` |
+| New specific tasks (7) | `locomotion_demo`, `general_demo`, `research_platform`, `entertainment`, `home_cleaning`, `lawn_mowing`, `personal_assistant` |
+| New broad task types (3) | `locomotion`, `entertainment`, `research` |
+| Prompt example | Changed from transportation-anchored to manipulation case study |
+| Critical rules | Entertainment/dance/costume content → `locomotion_demo`/`entertainment`, NOT industrial tasks |
+| Personal Service section | Added to prompt with companion, home_cleaning, lawn_mowing, entertainment |
+| Standalone scripts | Updated `crawl_social_platforms.py` and `crawl_tiktok_expanded.py` with new task guidance |
+| MasonryGrid | Fixed to prefer `specific_tasks` over `task_types` |
+
+**Reclassification Results (1000 items):**
+| Task Type | Before | After |
+|-----------|--------|-------|
+| transportation | 718 | 153 (-78.7%) |
+| manipulation | — | 613 |
+| locomotion | 0 | 97 |
+| entertainment | 0 | 124 |
+
+**Content Type Distribution After:**
+| Type | Count | % |
+|------|-------|---|
+| real_application | 305 | 30.5% |
+| tech_demo | 245 | 24.5% |
+| case_study | 172 | 17.2% |
+| product_announcement | 169 | 16.9% |
+| interview_comment | 56 | 5.6% |
+| tutorial | 43 | 4.3% |
+| pilot_poc | 10 | 1.0% |
+
+### Phase 4: Content Fixes & Usability
+
+**Sparkles Duplicate Fix:**
+- Removed LinkedIn duplicate `c06282e2` ("Meet Sparkles | Boston Dynamics") — wrongly classified as `real_application`/`industrial`/`pallet_transport`
+- Added YouTube original `378b16cc` — correctly classified as `tech_demo`/`personal_service`/`companion`, educational_value=1
+
+**Internal ID Display:**
+- Added `#xxxxxxxx` (first 8 chars of UUID) to GalleryCard, MasonryGrid GridCard, and GalleryDetailModal
+- Subtle monospace, selectable, full UUID in tooltip
+- Enables admins and users to reference specific gallery items
+
+**Utility Script:**
+- Created `crawler/src/add_single_video.py` for crawling individual YouTube videos by URL
+
+**Commit:** `f638995`
+
+### Git Commits This Session
+
+| Hash | Description |
+|------|-------------|
+| `577e9ed` | Align taxonomy with KG Axis 1: expand application_category from 3 to 5 values |
+| `8c852fb` | Add application_category to reclassification script updates |
+| `40d23b7` | Add medical and specialized task vocabulary to classifier and frontend |
+| `f638995` | Fix transportation mislabeling, add internal IDs, and expand task vocabulary |
+
+### Lessons Learned
+
+1. **Prompt examples create bias** — The JSON example anchoring on "transportation" caused over-classification
+2. **Vocabulary gaps cause misclassification** — Missing medical/entertainment tasks forced AI to pick wrong categories
+3. **material_handling is NOT transportation** — A robot moving material is manipulation, not transport
+4. **Cross-platform duplicates need deduplication** — LinkedIn reposts of YouTube videos create duplicates
+5. **Internal IDs are essential** — Without reference codes, users cannot communicate about specific items
+6. **Tasks are orthogonal to taxonomy axes** — They don't need to match the KG 7-axis structure
+
+---
+
+## Session 10: 2026-02-21 - Admin Interface Enhancement (In Progress)
+
+### Overview
+
+Enhancing the existing admin interface to support classification editing, manual content addition, and browse-mode review. Building on existing AdminModerationPage, ContentQueue, ItemReviewModal, and ReportsQueue components.
+
+### Existing Admin Functions (Before Enhancement)
+
+| Function | Component | Status |
+|----------|-----------|--------|
+| Content moderation queue | ContentQueue.tsx | Exists (approve/reject/flag) |
+| Item review modal | ItemReviewModal.tsx | Exists (read-only metadata view) |
+| Reports queue | ReportsQueue.tsx | Exists (dismiss/resolve) |
+| Moderation stats | moderation-service.ts | Exists (counts) |
+
+### Target Admin Functions (After Enhancement)
+
+| # | Function | Description | Priority |
+|---|----------|-------------|----------|
+| 1 | **Classification Editor** | Edit content_type, category, tasks, scene_type, educational_value for any item | P0 |
+| 2 | **Manual URL Addition** | Admin pastes YouTube/article URL → system fetches, classifies, and stores | P0 |
+| 3 | **Browse All Content** | Searchable, filterable table of all approved items with inline editing | P0 |
+| 4 | **Batch Reclassify** | Select multiple items and trigger AI reclassification | P1 |
+| 5 | **Edit History** | Track who changed what and when | P1 |
+| 6 | **Duplicate Detection** | Find and merge cross-platform duplicates | P2 |
+| 7 | **Admin Lock** | Prevent AI reclassification from overwriting human edits | P1 |
+| 8 | **RSIP SSO Integration** | Login via RSIP V2 auth system (shared Supabase) | P1 |
+
+### Implementation Plan
+
+**Phase 1 (Current):** Classification Editor + Manual URL Addition + Browse View
+**Phase 2:** Batch operations + Edit history + Admin lock
+**Phase 3:** SSO integration + Duplicate detection
+
+---
+
 *Log maintained by development team*
-*Last updated: 2026-02-04*
+*Last updated: 2026-02-21*

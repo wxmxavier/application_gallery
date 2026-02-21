@@ -10,7 +10,8 @@ import type {
   ItemStatus,
   ReportStatus,
 } from '../types/moderation';
-import type { GalleryItem } from '../types/gallery';
+import type { GalleryItem, ContentType, ApplicationCategory } from '../types/gallery';
+import type { ClassificationUpdate } from '../components/admin/ClassificationEditor';
 
 /**
  * Get pending content items for moderation
@@ -359,6 +360,217 @@ export async function bulkDismissReports(
   } catch (err) {
     console.error('Moderation service error:', err);
     return { success: false, error: 'Failed to bulk dismiss reports' };
+  }
+}
+
+/**
+ * Update classification for a gallery item
+ */
+export async function updateClassification(
+  itemId: string,
+  updates: ClassificationUpdate
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase
+      .from('application_gallery')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', itemId);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('Classification update error:', err);
+    return { success: false, error: 'Failed to update classification' };
+  }
+}
+
+/**
+ * Delete a gallery item permanently
+ */
+export async function deleteContent(
+  itemId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase
+      .from('application_gallery')
+      .delete()
+      .eq('id', itemId);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('Delete error:', err);
+    return { success: false, error: 'Failed to delete content' };
+  }
+}
+
+/**
+ * Browse all gallery content with search, filter, and pagination
+ */
+export async function browseAllContent(params: {
+  search?: string;
+  category?: ApplicationCategory;
+  contentType?: ContentType;
+  offset?: number;
+  limit?: number;
+}): Promise<{ data: GalleryItem[]; count: number }> {
+  try {
+    let query = supabase
+      .from('application_gallery')
+      .select('*', { count: 'exact' })
+      .eq('status', 'approved')
+      .order('created_at', { ascending: false });
+
+    if (params.category) {
+      query = query.eq('application_category', params.category);
+    }
+    if (params.contentType) {
+      query = query.eq('content_type', params.contentType);
+    }
+    if (params.search) {
+      // Search by title or ID prefix
+      if (params.search.startsWith('#')) {
+        const idPrefix = params.search.slice(1);
+        query = query.ilike('id', `${idPrefix}%`);
+      } else {
+        query = query.ilike('title', `%${params.search}%`);
+      }
+    }
+
+    const offset = params.offset || 0;
+    const limit = params.limit || 25;
+    query = query.range(offset, offset + limit - 1);
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      console.error('Browse content error:', error);
+      return { data: [], count: 0 };
+    }
+
+    return { data: (data || []) as GalleryItem[], count: count || 0 };
+  } catch (err) {
+    console.error('Browse content error:', err);
+    return { data: [], count: 0 };
+  }
+}
+
+/**
+ * Add content by URL - fetches YouTube oEmbed metadata and inserts
+ * For non-YouTube URLs, creates a basic entry for manual classification
+ */
+export async function addContentByUrl(
+  url: string
+): Promise<{ item?: GalleryItem; error?: string }> {
+  try {
+    // Detect platform and extract metadata
+    let title = '';
+    let thumbnailUrl = '';
+    let sourceName = 'Unknown';
+    let sourceType = 'other';
+    let mediaType = 'article';
+    let contentUrl: string | null = null;
+
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      // YouTube: Use oEmbed API
+      const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+      const response = await fetch(oembedUrl);
+
+      if (!response.ok) {
+        return { error: 'Failed to fetch YouTube video metadata. Check the URL.' };
+      }
+
+      const data = await response.json();
+      title = data.title || 'Untitled YouTube Video';
+      thumbnailUrl = data.thumbnail_url || '';
+      sourceName = data.author_name || 'YouTube';
+      sourceType = 'youtube';
+      mediaType = 'video';
+
+      // Extract video ID for embed URL
+      const videoIdMatch = url.match(/(?:v=|\/)([\w-]{11})/);
+      if (videoIdMatch) {
+        contentUrl = `https://www.youtube.com/embed/${videoIdMatch[1]}`;
+      }
+    } else if (url.includes('tiktok.com')) {
+      sourceType = 'tiktok';
+      sourceName = 'TikTok';
+      mediaType = 'video';
+      title = 'TikTok Video';
+    } else if (url.includes('linkedin.com')) {
+      sourceType = 'linkedin';
+      sourceName = 'LinkedIn';
+      title = 'LinkedIn Post';
+    } else if (url.includes('twitter.com') || url.includes('x.com')) {
+      sourceType = 'twitter';
+      sourceName = 'X/Twitter';
+      title = 'X Post';
+    } else {
+      // Generic URL - extract domain as source name
+      try {
+        const urlObj = new URL(url);
+        sourceName = urlObj.hostname.replace('www.', '');
+      } catch {
+        sourceName = 'Website';
+      }
+      title = 'Content from ' + sourceName;
+    }
+
+    // Generate a unique external_id
+    const externalId = `manual_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+    // Insert into database with default classification
+    const insertData = {
+      external_id: externalId,
+      source_type: sourceType,
+      source_url: url,
+      source_name: sourceName,
+      title,
+      media_type: mediaType,
+      thumbnail_url: thumbnailUrl || null,
+      content_url: contentUrl,
+      content_type: 'tech_demo' as const,
+      application_category: 'industrial' as const,
+      deployment_maturity: 'unknown',
+      educational_value: 2,
+      specific_tasks: [],
+      task_types: [],
+      functional_requirements: [],
+      robot_names: [],
+      robot_types: [],
+      manufacturers: [],
+      view_count: 0,
+      featured: false,
+      status: 'approved',
+      ai_summary: 'Manually added by admin — awaiting classification',
+    };
+
+    const { data, error } = await supabase
+      .from('application_gallery')
+      .insert(insertData)
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === '23505') {
+        return { error: 'This URL already exists in the gallery.' };
+      }
+      return { error: error.message };
+    }
+
+    return { item: data as GalleryItem };
+  } catch (err) {
+    console.error('Add content error:', err);
+    return { error: 'Failed to add content. Please try again.' };
   }
 }
 
