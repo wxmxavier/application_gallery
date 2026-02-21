@@ -36,10 +36,13 @@ async def fetch_all_items(supabase: Client, limit: int = None) -> List[Dict[str,
     return response.data
 
 
-async def update_item(supabase: Client, item_id: str, classification: Dict[str, Any], dry_run: bool = False) -> bool:
+async def update_item(supabase: Client, item_id: str, classification: Dict[str, Any],
+                      old_category: str = None, dry_run: bool = False) -> bool:
     """Update an item with new V2 classification"""
+    new_category = classification.get('application_category', 'industrial')
     update_data = {
         'content_type': classification.get('content_type', 'unknown'),
+        'application_category': new_category,
         'deployment_maturity': classification.get('deployment_maturity', 'unknown'),
         'educational_value': classification.get('educational_value', 3),
         'specific_tasks': classification.get('specific_tasks', []),
@@ -54,10 +57,13 @@ async def update_item(supabase: Client, item_id: str, classification: Dict[str, 
     if classification.get('scene_type'):
         update_data['scene_type'] = classification['scene_type']
 
+    category_changed = old_category and old_category != new_category
     if dry_run:
         logger.info("DRY RUN - Would update item",
                    item_id=item_id,
                    content_type=update_data['content_type'],
+                   application_category=new_category,
+                   category_changed=f"{old_category} → {new_category}" if category_changed else "unchanged",
                    educational_value=update_data['educational_value'])
         return True
 
@@ -87,6 +93,13 @@ async def reclassify_batch(
         'unknown': 0,
         'errors': 0,
         'updated': 0,
+        # Category stats
+        'cat_industrial': 0,
+        'cat_professional_service': 0,
+        'cat_personal_service': 0,
+        'cat_medical': 0,
+        'cat_specialized_environment': 0,
+        'cat_changes': 0,
     }
 
     for item in items:
@@ -105,13 +118,23 @@ async def reclassify_batch(
             content_type = classification.get('content_type', 'unknown')
             stats[content_type] = stats.get(content_type, 0) + 1
 
+            # Track category
+            new_category = classification.get('application_category', 'industrial')
+            old_category = item.get('application_category', '')
+            cat_key = f'cat_{new_category}'
+            stats[cat_key] = stats.get(cat_key, 0) + 1
+            if old_category and old_category != new_category:
+                stats['cat_changes'] += 1
+
             # Update in database
-            if await update_item(supabase, item['id'], classification, dry_run):
+            if await update_item(supabase, item['id'], classification, old_category, dry_run):
                 stats['updated'] += 1
 
             logger.info("Classified item",
                        title=item['title'][:50],
                        content_type=content_type,
+                       application_category=new_category,
+                       category_changed=f"{old_category} → {new_category}" if old_category != new_category else "unchanged",
                        educational_value=classification.get('educational_value'),
                        deployment_maturity=classification.get('deployment_maturity'))
 
@@ -162,6 +185,12 @@ async def main():
         'unknown': 0,
         'errors': 0,
         'updated': 0,
+        'cat_industrial': 0,
+        'cat_professional_service': 0,
+        'cat_personal_service': 0,
+        'cat_medical': 0,
+        'cat_specialized_environment': 0,
+        'cat_changes': 0,
     }
 
     for i in range(0, total_items, args.batch_size):
@@ -198,6 +227,24 @@ async def main():
         bar = "█" * int(pct / 2)
         print(f"  {ct:25} {count:4} ({pct:5.1f}%) {bar}")
 
+    # Category distribution
+    print("\nApplication Category Distribution:")
+    print("-"*40)
+    categories = [
+        ('industrial', 'cat_industrial'),
+        ('professional_service', 'cat_professional_service'),
+        ('personal_service', 'cat_personal_service'),
+        ('medical', 'cat_medical'),
+        ('specialized_environment', 'cat_specialized_environment'),
+    ]
+    for label, key in categories:
+        count = total_stats.get(key, 0)
+        pct = count * 100 / total_items if total_items > 0 else 0
+        bar = "█" * int(pct / 2)
+        print(f"  {label:25} {count:4} ({pct:5.1f}%) {bar}")
+
+    print(f"\n  Category reassignments:  {total_stats['cat_changes']}")
+
     # Quality content summary
     quality_count = total_stats['real_application'] + total_stats['case_study'] + total_stats['pilot_poc']
     demo_count = total_stats['tech_demo'] + total_stats['product_announcement']
@@ -207,9 +254,9 @@ async def main():
     print(f"Demo/Marketing content: {demo_count} ({demo_count * 100 / total_items:.1f}%)")
 
     if args.dry_run:
-        print("\n⚠️  DRY RUN - No changes were made to the database")
+        print("\n  DRY RUN - No changes were made to the database")
     else:
-        print("\n✅ Database updated successfully")
+        print("\n  Database updated successfully")
 
 
 if __name__ == '__main__':
