@@ -42,28 +42,35 @@ npm run build:vite-only         # Build without type check
 npm run type-check              # TypeScript check only
 ```
 
-## RSIP-Aligned Taxonomy
+## RSIP-Aligned Taxonomy (KG Axis 1)
 
-Content is organized by RSIP platform concepts, NOT by robot brand:
+Content is organized by RSIP platform concepts, NOT by robot brand. The Knowledge Graph is the single source of truth.
 
-### Application Categories (Primary)
-- `industrial_automation` - Factory, warehouse, manufacturing
-- `service_robotics` - Hospitality, healthcare, delivery
-- `surveillance_security` - Patrol, monitoring, access control
+### Application Categories (5 values — KG Axis 1)
+- `industrial` - Factory, warehouse, manufacturing, assembly, logistics
+- `professional_service` - Delivery, hospitality, cleaning, security, agriculture, construction, education
+- `personal_service` - Domestic (home cleaning, lawn), companion, entertainment
+- `medical` - Surgical, rehabilitation, pharmacy, diagnostic, hospital
+- `specialized_environment` - Defense, hazardous, space, underwater
 
-### Task Types (Secondary)
-- Industrial: `transportation`, `inspection`, `manipulation`, `palletizing`, `welding`, `assembly`
-- Service: `delivery_service`, `human_interaction`, `healthcare_assist`, `cleaning`
-- Security: `perimeter_patrol`, `threat_detection`, `access_monitoring`
+### Content Types (8 values)
+- `real_application` - Deployed in actual business
+- `pilot_poc` - Trial deployment
+- `case_study` - Documented with results
+- `tech_demo` - Capability demonstration
+- `product_announcement` - New product reveal
+- `tutorial` - How-to content
+- `interview_comment` - Interviews, commentary, reactions
+- `unknown` - Not yet classified
 
-### Functional Requirements (Tags)
-74 RSIP-defined requirements including:
-- Navigation: `autonomous_navigation`, `obstacle_avoidance`, `precision_positioning`
-- Manipulation: `pick_and_place`, `bin_picking_3d`, `kitting_sorting`
-- Service: `indoor_delivery`, `hri_multimodal`, `telepresence`
+### Task Types (Broad — for backward compatibility)
+`transportation`, `inspection`, `manipulation`, `palletizing`, `welding`, `assembly`, `quality_control`, `packaging`, `delivery_service`, `human_interaction`, `healthcare_assist`, `cleaning`, `perimeter_patrol`, `threat_detection`, `access_monitoring`, `entertainment`, `locomotion`, `research`
+
+### Specific Tasks (Granular — preferred)
+See `frontend/src/types/gallery.ts` → `SPECIFIC_TASK_INFO` for the full list (~50 tasks across all categories).
 
 ### Scene Types
-`warehouse`, `manufacturing`, `retail`, `hospital`, `office`, `hotel`, `outdoor`, `laboratory`
+`warehouse`, `manufacturing`, `retail`, `hospital`, `office`, `hotel`, `outdoor`, `laboratory`, `construction`, `logistics_center`, `airport`, `restaurant`, `residential`, `campus`
 
 ## Database
 
@@ -172,7 +179,51 @@ Video_Library/
 
 ## 🚨 MANDATORY DEVELOPMENT RULES
 
-### Database Migration Rules
+### 1. Taxonomy Compliance (FIRST PRIORITY)
+
+**All development MUST comply with the RSIP Unified Taxonomy governed by the Knowledge Graph (KG).**
+
+The KG is the **single source of truth** for all classification values. Before adding, changing, or removing any category, task type, content type, or classification field, you MUST consult the authoritative taxonomy documents and ensure alignment.
+
+**Authoritative Documents (read before any taxonomy-related change):**
+
+| Document | Path | Purpose |
+|----------|------|---------|
+| Cross-Platform Architecture | `/knowledge_graph/docs/CROSS_PLATFORM_TAXONOMY_ARCHITECTURE.md` | Master architecture — 7-axis taxonomy, KG as authority |
+| Video Library Implementation | `/TAXONOMY_IMPLEMENTATION_VIDEO_LIBRARY.md` | Video Library-specific rules, what applies and what doesn't |
+| V2 Implementation | `/TAXONOMY_IMPLEMENTATION_V2.md` | Demo platform taxonomy spec |
+| Expert Panel Report | `/TAXONOMY_EXPERT_PANEL_REPORT.md` | Original taxonomy design rationale |
+
+**Key Files That Must Stay Aligned:**
+
+| File | What it defines |
+|------|----------------|
+| `frontend/src/types/gallery.ts` | `ApplicationCategory`, `ContentType`, `CATEGORY_INFO`, `SPECIFIC_TASK_INFO`, `SCENE_INFO` |
+| `crawler/src/processors/ai_classifier.py` | `valid_categories`, `valid_content_types`, `valid_specific_tasks`, `CLASSIFICATION_PROMPT_V2` |
+| `crawler/config/sources.yaml` | `default_category` values for all crawl sources |
+| `frontend/src/services/gallery-service.ts` | Category arrays in `getDefaultFilterOptions()`, `getGalleryStats()` |
+| `supabase/migrations/094_expand_application_categories.sql` | DB CHECK constraint for `application_category` |
+| `supabase/migrations/093_fix_content_type_unknown.sql` | DB CHECK constraint for `content_type` |
+
+**Current Taxonomy Values (KG Axis 1 aligned):**
+
+```
+ApplicationCategory: industrial | professional_service | personal_service | medical | specialized_environment
+ContentType: real_application | pilot_poc | case_study | tech_demo | product_announcement | tutorial | interview_comment | unknown
+DeploymentMaturity: production | pilot | prototype | concept | unknown
+```
+
+**Rules:**
+1. **Never invent new category values** without checking KG architecture doc first
+2. **Tasks are orthogonal to the 7-axis taxonomy** — they live in `specific_tasks`/`task_types`, NOT in the axes
+3. **Only Axis 1 (Application Domain) applies** to video classification — the other 6 axes (Form Factor, Mobility, etc.) classify robots, not video content
+4. **Classifier prompt, TypeScript types, and DB constraints must always match** — a value valid in one must be valid in all three
+5. **When adding new specific_tasks**, also add to: classifier `valid_specific_tasks`, `_map_to_broad_tasks()`, frontend `SPECIFIC_TASK_INFO`
+6. **Default fallback category is `industrial`**, default fallback content_type is `tech_demo`
+
+---
+
+### 2. Database Migration Rules
 
 **⚠️ Agents DO NOT have permission to migrate database directly**
 
@@ -195,7 +246,7 @@ UPDATE table_name SET uuid_column = 'string-value';
 UPDATE table_name SET uuid_column = 'string-value'::uuid;
 ```
 
-### Environment Variable Rules
+### 3. Environment Variable Rules
 
 **MANDATORY**: Use a single `.env` file. Never use `.env.local` or other variants.
 
@@ -210,7 +261,7 @@ SUPABASE_SERVICE_ROLE_KEY=...
 
 **Critical Rule**: Never use `process.env` in frontend code - use `import.meta.env.VITE_*` instead.
 
-### Component Development Rules
+### 4. Component Development Rules
 
 1. **Verify component usage** before modifying:
    ```bash
