@@ -25,9 +25,12 @@ from processors.ai_classifier import RSIPClassifier
 logger = structlog.get_logger()
 
 
-async def fetch_all_items(supabase: Client, limit: int = None) -> List[Dict[str, Any]]:
-    """Fetch all approved items from the database"""
+async def fetch_all_items(supabase: Client, limit: int = None, categories: List[str] = None) -> List[Dict[str, Any]]:
+    """Fetch all approved items from the database, optionally filtered by category"""
     query = supabase.table('application_gallery').select('*').eq('status', 'approved')
+
+    if categories:
+        query = query.in_('application_category', categories)
 
     if limit:
         query = query.limit(limit)
@@ -153,6 +156,7 @@ async def main():
     parser.add_argument('--dry-run', action='store_true', help='Preview without updating')
     parser.add_argument('--limit', type=int, default=None, help='Limit items to process')
     parser.add_argument('--batch-size', type=int, default=10, help='Batch size')
+    parser.add_argument('--category', nargs='+', default=None, help='Only reclassify items in these categories')
     args = parser.parse_args()
 
     config = get_config()
@@ -166,10 +170,11 @@ async def main():
     logger.info("Starting V2 re-classification",
                dry_run=args.dry_run,
                limit=args.limit,
-               batch_size=args.batch_size)
+               batch_size=args.batch_size,
+               categories=args.category or "all")
 
-    # Fetch all items
-    items = await fetch_all_items(supabase, args.limit)
+    # Fetch items
+    items = await fetch_all_items(supabase, args.limit, args.category)
     total_items = len(items)
     logger.info(f"Found {total_items} items to re-classify")
 

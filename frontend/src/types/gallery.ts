@@ -346,6 +346,25 @@ export const SPECIFIC_TASK_INFO: Record<string, {
   remote_monitoring: { label: 'Remote Monitoring', labelZh: '远程监控', category: 'professional_service' },
   threat_detection: { label: 'Threat Detection', labelZh: '威胁检测', category: 'professional_service' },
   facility_inspection: { label: 'Facility Inspection', labelZh: '设施巡检', category: 'professional_service' },
+
+  // Medical
+  surgical_procedure: { label: 'Surgical Procedure', labelZh: '外科手术', category: 'medical' },
+  rehabilitation_therapy: { label: 'Rehabilitation', labelZh: '康复治疗', category: 'medical' },
+  pharmacy_dispensing: { label: 'Pharmacy Dispensing', labelZh: '药房配药', category: 'medical' },
+  lab_automation: { label: 'Lab Automation', labelZh: '实验室自动化', category: 'medical' },
+  sample_handling: { label: 'Sample Handling', labelZh: '样本处理', category: 'medical' },
+  cell_therapy: { label: 'Cell Therapy', labelZh: '细胞治疗', category: 'medical' },
+  diagnostic_imaging: { label: 'Diagnostic Imaging', labelZh: '诊断成像', category: 'medical' },
+  patient_monitoring: { label: 'Patient Monitoring', labelZh: '患者监测', category: 'medical' },
+  sterilization: { label: 'Sterilization', labelZh: '灭菌消毒', category: 'medical' },
+
+  // Specialized Environment
+  hazardous_inspection: { label: 'Hazardous Inspection', labelZh: '危险环境检查', category: 'specialized_environment' },
+  bomb_disposal: { label: 'Bomb Disposal', labelZh: '排爆', category: 'specialized_environment' },
+  underwater_operation: { label: 'Underwater Operation', labelZh: '水下作业', category: 'specialized_environment' },
+  space_operation: { label: 'Space Operation', labelZh: '太空作业', category: 'specialized_environment' },
+  nuclear_decommission: { label: 'Nuclear Decommission', labelZh: '核退役', category: 'specialized_environment' },
+  firefighting: { label: 'Firefighting', labelZh: '消防', category: 'specialized_environment' },
 };
 
 // Helper: Get default filters (show quality content only)

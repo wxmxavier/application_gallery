@@ -65,7 +65,7 @@ CLASSIFICATION TASKS:
    - medical: Surgical, rehabilitation, pharmacy, diagnostic, hospital
    - specialized_environment: Defense, hazardous environment, space, underwater
 
-4. SPECIFIC_TASKS (be specific, choose 1-3):
+4. SPECIFIC_TASKS (be specific, choose 1-3 from the matching category):
    Industrial: pallet_transport, tote_transport, cart_towing, dock_to_stock,
               machine_tending, assembly_insertion, case_palletizing, depalletizing,
               visual_inspection, weld_inspection, screw_driving, material_handling,
@@ -75,6 +75,11 @@ CLASSIFICATION TASKS:
            telepresence, inventory_scanning, companion, concierge
    Security: perimeter_patrol, intrusion_detection, access_verification,
             remote_monitoring, threat_detection, facility_inspection
+   Medical: surgical_procedure, rehabilitation_therapy, pharmacy_dispensing,
+           lab_automation, sample_handling, cell_therapy, diagnostic_imaging,
+           patient_monitoring, sterilization
+   Specialized: hazardous_inspection, bomb_disposal, underwater_operation,
+               space_operation, nuclear_decommission, firefighting
 
 5. SCENE_TYPE: warehouse, manufacturing, retail, hospital, office, hotel,
                outdoor, laboratory, construction, logistics_center, airport,
@@ -382,9 +387,20 @@ class RSIPClassifier:
             # Medical
             "surgical_procedure": "healthcare_assist",
             "rehabilitation_therapy": "healthcare_assist",
-            "pharmacy_dispensing": "delivery_service",
+            "pharmacy_dispensing": "healthcare_assist",
+            "lab_automation": "healthcare_assist",
+            "sample_handling": "healthcare_assist",
+            "cell_therapy": "healthcare_assist",
+            "diagnostic_imaging": "healthcare_assist",
+            "patient_monitoring": "healthcare_assist",
+            "sterilization": "healthcare_assist",
             # Specialized/hazardous
             "hazardous_inspection": "inspection",
+            "bomb_disposal": "threat_detection",
+            "underwater_operation": "inspection",
+            "space_operation": "inspection",
+            "nuclear_decommission": "inspection",
+            "firefighting": "threat_detection",
         }
 
         broad_tasks = set()
