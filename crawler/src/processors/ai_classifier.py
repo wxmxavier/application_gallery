@@ -88,7 +88,7 @@ CLASSIFICATION TASKS:
 
 5. SCENE_TYPE: warehouse, manufacturing, retail, hospital, office, hotel,
                outdoor, laboratory, construction, logistics_center, airport,
-               restaurant, residential, campus
+               restaurant, residential, campus, entertainment_venue
 
 6. APPLICATION_CONTEXT:
    - problem_solved: What business problem? (labor_shortage, safety_hazard,
@@ -218,7 +218,7 @@ class RSIPClassifier:
         self.valid_scene_types = [
             "warehouse", "manufacturing", "retail", "hospital", "office",
             "hotel", "outdoor", "laboratory", "construction", "logistics_center",
-            "airport", "restaurant", "residential", "campus"
+            "airport", "restaurant", "residential", "campus", "entertainment_venue"
         ]
 
     async def classify(self, item: Dict[str, Any]) -> Dict[str, Any]:

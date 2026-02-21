@@ -32,7 +32,7 @@ Classify according to RSIP taxonomy:
 2. content_type: real_application | pilot_poc | case_study | tech_demo | product_announcement | tutorial | interview_comment
 3. educational_value: 1-5 (5=detailed case study with metrics, 1=pure marketing/entertainment)
 4. task_types: Array of relevant tasks like transportation, inspection, manipulation, palletizing, welding, assembly, delivery_service, human_interaction, cleaning, perimeter_patrol, bin_picking, kitting, healthcare_assist, locomotion, entertainment, etc.
-5. scene_type: warehouse | manufacturing | retail | hospital | office | hotel | outdoor | laboratory
+5. scene_type: warehouse | manufacturing | retail | hospital | office | hotel | outdoor | laboratory | construction | logistics_center | airport | restaurant | residential | campus | entertainment_venue
 6. ai_summary: One sentence summary of what this content shows
 
 IMPORTANT CLASSIFICATION RULES:

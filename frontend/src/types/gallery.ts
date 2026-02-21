@@ -288,6 +288,7 @@ export const SCENE_INFO: Record<string, { label: string; labelZh: string }> = {
   restaurant: { label: 'Restaurant', labelZh: '餐厅' },
   residential: { label: 'Residential', labelZh: '住宅' },
   campus: { label: 'Campus', labelZh: '园区' },
+  entertainment_venue: { label: 'Entertainment Venue', labelZh: '演艺场所' },
 };
 
 // V2: Specific tasks display info

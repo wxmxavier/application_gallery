@@ -70,7 +70,7 @@ Content is organized by RSIP platform concepts, NOT by robot brand. The Knowledg
 See `frontend/src/types/gallery.ts` → `SPECIFIC_TASK_INFO` for the full list (~50 tasks across all categories).
 
 ### Scene Types
-`warehouse`, `manufacturing`, `retail`, `hospital`, `office`, `hotel`, `outdoor`, `laboratory`, `construction`, `logistics_center`, `airport`, `restaurant`, `residential`, `campus`
+`warehouse`, `manufacturing`, `retail`, `hospital`, `office`, `hotel`, `outdoor`, `laboratory`, `construction`, `logistics_center`, `airport`, `restaurant`, `residential`, `campus`, `entertainment_venue`
 
 ## Database
 
