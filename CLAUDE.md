@@ -69,8 +69,26 @@ Content is organized by RSIP platform concepts, NOT by robot brand. The Knowledg
 ### Specific Tasks (Granular — preferred)
 See `frontend/src/types/gallery.ts` → `SPECIFIC_TASK_INFO` for the full list (~50 tasks across all categories).
 
-### Scene Types
-`warehouse`, `manufacturing`, `retail`, `hospital`, `office`, `hotel`, `outdoor`, `laboratory`, `construction`, `logistics_center`, `airport`, `restaurant`, `residential`, `campus`, `entertainment_venue`
+### Scene Types (15 short keys → 20 canonical DB keys)
+Video Library uses short keys internally; each maps to a canonical `environment_types.environment_key` in Supabase via `SCENE_INFO.dbEnvironmentKey` in `frontend/src/types/gallery.ts`.
+
+| Short key | DB environment_key | Category |
+|-----------|-------------------|----------|
+| `warehouse` | `warehouse_logistics` | industrial |
+| `manufacturing` | `manufacturing_floor` | industrial |
+| `laboratory` | `laboratory_research` | industrial |
+| `construction` | `construction_site` | industrial |
+| `logistics_center` | `logistics_center` | industrial |
+| `retail` | `retail_shopping` | professional_service |
+| `hotel` | `hotel_hospitality` | professional_service |
+| `office` | `office_corporate` | professional_service |
+| `campus` | `educational_campus` | professional_service |
+| `outdoor` | `outdoor_public` | professional_service |
+| `restaurant` | `restaurant_food_service` | professional_service |
+| `airport` | `airport_terminal` | professional_service |
+| `hospital` | `hospital_healthcare` | medical |
+| `residential` | `residential_home` | personal_service |
+| `entertainment_venue` | `entertainment_venue` | personal_service |
 
 ## Database
 
@@ -85,7 +103,7 @@ See `frontend/src/types/gallery.ts` → `SPECIFIC_TASK_INFO` for the full list (
 ### Migration Rules (from RSIP)
 - Always use `::uuid` casting for UUID columns in SQL
 - Never migrate directly - create migration files and apply via Supabase Dashboard
-- Keep numbering aligned with RSIP (currently at 085)
+- Keep numbering aligned with RSIP (currently at 098)
 
 ## Content Sources
 
@@ -198,12 +216,13 @@ The KG is the **single source of truth** for all classification values. Before a
 
 | File | What it defines |
 |------|----------------|
-| `frontend/src/types/gallery.ts` | `ApplicationCategory`, `ContentType`, `CATEGORY_INFO`, `SPECIFIC_TASK_INFO`, `SCENE_INFO` |
+| `frontend/src/types/gallery.ts` | `ApplicationCategory`, `ContentType`, `CATEGORY_INFO`, `SPECIFIC_TASK_INFO`, `SCENE_INFO` (incl. `dbEnvironmentKey` mapping) |
 | `crawler/src/processors/ai_classifier.py` | `valid_categories`, `valid_content_types`, `valid_specific_tasks`, `CLASSIFICATION_PROMPT_V2` |
 | `crawler/config/sources.yaml` | `default_category` values for all crawl sources |
 | `frontend/src/services/gallery-service.ts` | Category arrays in `getDefaultFilterOptions()`, `getGalleryStats()` |
 | `supabase/migrations/094_expand_application_categories.sql` | DB CHECK constraint for `application_category` |
 | `supabase/migrations/093_fix_content_type_unknown.sql` | DB CHECK constraint for `content_type` |
+| `supabase/migrations/098_platform_sync_environments.sql` | Cross-platform environment_types sync, category 5-domain migration |
 
 **Current Taxonomy Values (KG Axis 1 aligned):**
 
@@ -235,7 +254,7 @@ DeploymentMaturity: production | pilot | prototype | concept | unknown
 **Migration File Naming Convention:**
 - Format: `XXX_description_of_change.sql` (e.g., `088_dmca_requests.sql`)
 - Increment the number sequentially from the last migration
-- Current highest: 088
+- Current highest: 098
 
 **UUID Casting in SQL:**
 ```sql
@@ -394,5 +413,6 @@ Video_Library/
     └── migrations/
         ├── 085_application_gallery.sql
         ├── 087_add_social_source_types.sql
-        └── 088_dmca_requests.sql
+        ├── 088_dmca_requests.sql
+        └── 098_platform_sync_environments.sql  # Cross-platform env sync
 ```

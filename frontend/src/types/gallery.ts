@@ -273,22 +273,23 @@ export const CATEGORY_INFO: Record<ApplicationCategory, {
 };
 
 // Scene type display info
-export const SCENE_INFO: Record<string, { label: string; labelZh: string }> = {
-  warehouse: { label: 'Warehouse', labelZh: '仓库' },
-  manufacturing: { label: 'Manufacturing', labelZh: '制造车间' },
-  retail: { label: 'Retail', labelZh: '零售' },
-  hospital: { label: 'Hospital', labelZh: '医院' },
-  office: { label: 'Office', labelZh: '办公' },
-  hotel: { label: 'Hotel', labelZh: '酒店' },
-  outdoor: { label: 'Outdoor', labelZh: '户外' },
-  laboratory: { label: 'Laboratory', labelZh: '实验室' },
-  construction: { label: 'Construction', labelZh: '建筑' },
-  logistics_center: { label: 'Logistics Center', labelZh: '物流中心' },
-  airport: { label: 'Airport', labelZh: '机场' },
-  restaurant: { label: 'Restaurant', labelZh: '餐厅' },
-  residential: { label: 'Residential', labelZh: '住宅' },
-  campus: { label: 'Campus', labelZh: '园区' },
-  entertainment_venue: { label: 'Entertainment Venue', labelZh: '演艺场所' },
+// dbEnvironmentKey maps Video Library short keys → canonical environment_types.environment_key in Supabase
+export const SCENE_INFO: Record<string, { label: string; labelZh: string; dbEnvironmentKey: string }> = {
+  warehouse: { label: 'Warehouse', labelZh: '仓库', dbEnvironmentKey: 'warehouse_logistics' },
+  manufacturing: { label: 'Manufacturing', labelZh: '制造车间', dbEnvironmentKey: 'manufacturing_floor' },
+  retail: { label: 'Retail', labelZh: '零售', dbEnvironmentKey: 'retail_shopping' },
+  hospital: { label: 'Hospital', labelZh: '医院', dbEnvironmentKey: 'hospital_healthcare' },
+  office: { label: 'Office', labelZh: '办公', dbEnvironmentKey: 'office_corporate' },
+  hotel: { label: 'Hotel', labelZh: '酒店', dbEnvironmentKey: 'hotel_hospitality' },
+  outdoor: { label: 'Outdoor', labelZh: '户外', dbEnvironmentKey: 'outdoor_public' },
+  laboratory: { label: 'Laboratory', labelZh: '实验室', dbEnvironmentKey: 'laboratory_research' },
+  construction: { label: 'Construction', labelZh: '建筑', dbEnvironmentKey: 'construction_site' },
+  logistics_center: { label: 'Logistics Center', labelZh: '物流中心', dbEnvironmentKey: 'logistics_center' },
+  airport: { label: 'Airport', labelZh: '机场', dbEnvironmentKey: 'airport_terminal' },
+  restaurant: { label: 'Restaurant', labelZh: '餐厅', dbEnvironmentKey: 'restaurant_food_service' },
+  residential: { label: 'Residential', labelZh: '住宅', dbEnvironmentKey: 'residential_home' },
+  campus: { label: 'Campus', labelZh: '园区', dbEnvironmentKey: 'educational_campus' },
+  entertainment_venue: { label: 'Entertainment Venue', labelZh: '演艺场所', dbEnvironmentKey: 'entertainment_venue' },
 };
 
 // V2: Specific tasks display info
