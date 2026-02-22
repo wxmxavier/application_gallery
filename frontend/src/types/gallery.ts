@@ -372,6 +372,10 @@ export const SPECIFIC_TASK_INFO: Record<string, {
   home_cleaning: { label: 'Home Cleaning', labelZh: '家庭清洁', category: 'personal_service' },
   lawn_mowing: { label: 'Lawn Mowing', labelZh: '草坪修剪', category: 'personal_service' },
   entertainment: { label: 'Entertainment', labelZh: '娱乐表演', category: 'personal_service' },
+  stage_performance: { label: 'Stage Performance', labelZh: '舞台演出', category: 'personal_service' },
+  guided_tour: { label: 'Guided Tour', labelZh: '导览讲解', category: 'personal_service' },
+  crowd_interaction: { label: 'Crowd Interaction', labelZh: '人群互动', category: 'personal_service' },
+  interactive_exhibit: { label: 'Interactive Exhibit', labelZh: '互动展览', category: 'personal_service' },
   personal_assistant: { label: 'Personal Assistant', labelZh: '个人助理', category: 'personal_service' },
 
   // Cross-category

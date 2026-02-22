@@ -75,6 +75,7 @@ CLASSIFICATION TASKS:
               floor_scrubbing, vacuum_cleaning, disinfection, reception_greeting,
               wayfinding, telepresence, inventory_scanning, concierge
    Personal Service: companion, home_cleaning, lawn_mowing, entertainment,
+              stage_performance, guided_tour, crowd_interaction, interactive_exhibit,
               personal_assistant
    Security: perimeter_patrol, intrusion_detection, access_verification,
             remote_monitoring, threat_detection, facility_inspection
@@ -201,6 +202,7 @@ class RSIPClassifier:
             "telepresence", "inventory_scanning", "concierge",
             # Personal service specific
             "companion", "home_cleaning", "lawn_mowing", "entertainment",
+            "stage_performance", "guided_tour", "crowd_interaction", "interactive_exhibit",
             "personal_assistant",
             # Security specific
             "perimeter_patrol", "intrusion_detection", "access_verification",
@@ -428,6 +430,10 @@ class RSIPClassifier:
             "home_cleaning": "cleaning",
             "lawn_mowing": "manipulation",
             "entertainment": "entertainment",
+            "stage_performance": "entertainment",
+            "guided_tour": "human_interaction",
+            "crowd_interaction": "human_interaction",
+            "interactive_exhibit": "entertainment",
             "personal_assistant": "human_interaction",
             # Cross-category
             "locomotion_demo": "locomotion",

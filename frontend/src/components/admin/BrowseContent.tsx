@@ -1,7 +1,7 @@
 /**
  * Browse Content - Admin view of all gallery items with search, filter, and inline editing
  */
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Search,
   Filter,
@@ -190,7 +190,8 @@ export default function BrowseContent() {
             </thead>
             <tbody className="divide-y">
               {items.map(item => (
-                <tr key={item.id} className="hover:bg-gray-50">
+                <React.Fragment key={item.id}>
+                <tr className={`hover:bg-gray-50 ${editingId === item.id ? 'bg-blue-50/30' : ''}`}>
                   <td className="px-3 py-2">
                     <span className="font-mono text-[10px] text-gray-400 select-all" title={item.id}>
                       #{item.id.slice(0, 8)}
@@ -271,19 +272,22 @@ export default function BrowseContent() {
                     </div>
                   </td>
                 </tr>
+                {editingId === item.id && (
+                  <tr>
+                    <td colSpan={7} className="p-0">
+                      <div className="bg-blue-50/50 p-4 border-t border-b border-blue-100">
+                        <ClassificationEditor
+                          item={item}
+                          onSave={(updates) => handleSaveClassification(item.id, updates)}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
-
-          {/* Inline Editor (shown below the row) */}
-          {editingId && items.find(i => i.id === editingId) && (
-            <div className="border-t bg-blue-50/50 p-4">
-              <ClassificationEditor
-                item={items.find(i => i.id === editingId)!}
-                onSave={(updates) => handleSaveClassification(editingId, updates)}
-              />
-            </div>
-          )}
 
           {/* Pagination */}
           <div className="flex items-center justify-between px-4 py-3 border-t bg-gray-50">

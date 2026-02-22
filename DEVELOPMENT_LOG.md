@@ -1551,5 +1551,59 @@ Enhancing the existing admin interface to support classification editing, manual
 
 ---
 
+## Session 8: 2026-02-22 - Cross-Platform Taxonomy Synchronization
+
+### Context
+
+The 3 RSIP platforms (Video Library, V2, Knowledge Graph) share one Supabase database, but taxonomy values had diverged. The `environment_types` table used an old 3-category CHECK constraint, `application_categories` had 10 rows (5 legacy + 5 current), and the Video Library had real data for 6 scene types missing from the canonical DB.
+
+### Changes
+
+#### Migration 098: Platform Sync — Environment Types
+- Deleted 5 orphan `application_categories` rows (legacy `industrial_automation`, `service_robotics`, etc.)
+- Updated `environment_types.category` CHECK from 3-value (`industrial`/`service`/`special`) to 5-domain taxonomy
+- Migrated 14 existing environment_types rows to correct 5-domain values (e.g., `hospital_healthcare`: `service` → `medical`)
+- Inserted 6 new environment types: `laboratory_research` (338 items!), `logistics_center`, `restaurant_food_service`, `airport_terminal`, `residential_home`, `entertainment_venue`
+- Reclassified `functional_requirements.category_filter` for medical/personal_service requirements
+
+#### Migration 099: Reclassify Gallery Items to 5-Domain
+- **Root cause found**: Migration 094 had bulk-mapped all items into only `industrial` and `professional_service`, leaving `medical`, `personal_service`, and `specialized_environment` with 0 items
+- V2 team reported the 3 empty domains; analysis confirmed the content existed but was mislabeled
+- Used `specific_tasks`, `scene_type`, `task_types`, and title keyword matching to reclassify items
+- **Result**: medical: 64, personal_service: 55, specialized_environment: 30 (all were 0 before)
+
+#### Frontend & Classifier Updates
+- Added `dbEnvironmentKey` to `SCENE_INFO` — maps Video Library short keys to canonical `environment_types.environment_key` for cross-platform deep linking
+- Removed quality filters temporarily: all content types visible, educational value minimum set to 1
+- Fixed admin Browse Content editor: inline editor now appears directly below the edited row (was rendering outside the table at the bottom)
+- Added 4 entertainment-specific tasks: `stage_performance`, `guided_tour`, `crowd_interaction`, `interactive_exhibit` (to frontend types, classifier prompt, valid list, and broad task mapping)
+
+#### V2 Code Changes (outside this repo)
+- Updated `v2/app/src/services/environment-types.ts`: mock data categories to 5-domain, added `laboratory_research`, removed dead `mapLegacyCategoryToTaxonomyDomain()` function
+- Created `CROSS_PLATFORM_SYNC_SUMMARY_FOR_V2.md` handoff document for V2 team
+
+### DB State After Migrations
+
+| Table | Count | Notes |
+|-------|-------|-------|
+| `application_categories` | 5 | Clean: industrial, professional_service, personal_service, medical, specialized_environment |
+| `environment_types` | 20 | 14 existing + 6 new, all with 5-domain categories |
+| `application_gallery` | 1,450 | 1,361 approved + 89 pending; all 5 domains populated |
+| `functional_requirements` | 119 | `category_filter` updated to 5-domain where applicable |
+
+### Files Modified
+
+| File | Change |
+|------|--------|
+| `supabase/migrations/098_platform_sync_environments.sql` | NEW — environment sync migration |
+| `supabase/migrations/099_reclassify_gallery_5_domain.sql` | NEW — gallery reclassification |
+| `frontend/src/types/gallery.ts` | `dbEnvironmentKey` in SCENE_INFO, default filters, 4 new tasks |
+| `frontend/src/components/admin/BrowseContent.tsx` | Inline editor fix |
+| `crawler/src/processors/ai_classifier.py` | 4 new entertainment tasks in prompt, valid list, mapping |
+| `CLAUDE.md` | Scene types table, migration numbering |
+| `CROSS_PLATFORM_SYNC_SUMMARY_FOR_V2.md` | NEW — V2 team handoff |
+
+---
+
 *Log maintained by development team*
-*Last updated: 2026-02-21*
+*Last updated: 2026-02-22*
