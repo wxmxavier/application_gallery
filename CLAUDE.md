@@ -103,7 +103,7 @@ Video Library uses short keys internally; each maps to a canonical `environment_
 ### Migration Rules (from RSIP)
 - Always use `::uuid` casting for UUID columns in SQL
 - Never migrate directly - create migration files and apply via Supabase Dashboard
-- Keep numbering aligned with RSIP (currently at 098)
+- Keep numbering aligned with RSIP (currently at 099)
 
 ## Content Sources
 
@@ -254,7 +254,7 @@ DeploymentMaturity: production | pilot | prototype | concept | unknown
 **Migration File Naming Convention:**
 - Format: `XXX_description_of_change.sql` (e.g., `088_dmca_requests.sql`)
 - Increment the number sequentially from the last migration
-- Current highest: 098
+- Current highest: 099
 
 **UUID Casting in SQL:**
 ```sql
