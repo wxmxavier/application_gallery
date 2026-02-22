@@ -382,9 +382,9 @@ export const SPECIFIC_TASK_INFO: Record<string, {
 
 // Helper: Get default filters (show quality content only)
 export const getDefaultFilters = (): GalleryFilters => ({
-  content_types: ['real_application', 'case_study', 'pilot_poc'],
-  min_educational_value: 3,
-  include_demos: false,
+  content_types: undefined,  // All types
+  min_educational_value: 1,
+  include_demos: true,
 });
 
 // Helper: Get all content filters (include demos)
