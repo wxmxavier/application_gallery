@@ -84,9 +84,25 @@ export default function ClassificationEditor({ item, onSave, compact = false }: 
     setSummary(item.ai_summary || '');
   };
 
-  // Get tasks relevant to current category
+  // Map scene types to their implied application category
+  const SCENE_CATEGORY_MAP: Record<string, ApplicationCategory> = {
+    warehouse: 'industrial', manufacturing: 'industrial', laboratory: 'industrial',
+    construction: 'industrial', logistics_center: 'industrial',
+    retail: 'professional_service', hotel: 'professional_service', office: 'professional_service',
+    campus: 'professional_service', outdoor: 'professional_service',
+    restaurant: 'professional_service', airport: 'professional_service',
+    hospital: 'medical',
+    residential: 'personal_service', entertainment_venue: 'personal_service',
+  };
+  const sceneCategory = sceneType ? SCENE_CATEGORY_MAP[sceneType] : null;
+
+  // Get tasks relevant to current category AND scene type's category
   const relevantTasks = Object.entries(SPECIFIC_TASK_INFO)
-    .filter(([, info]) => info.category === category || tasks.includes(info.label.toLowerCase().replace(/ /g, '_')))
+    .filter(([key, info]) =>
+      info.category === category ||
+      (sceneCategory && info.category === sceneCategory) ||
+      tasks.includes(key)
+    )
     .map(([key]) => key);
 
   // All task keys for the dropdown
