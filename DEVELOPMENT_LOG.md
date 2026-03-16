@@ -1605,5 +1605,149 @@ The 3 RSIP platforms (Video Library, V2, Knowledge Graph) share one Supabase dat
 
 ---
 
+## Session 9: 2026-03-16 - Full Crawl Update & Global Source Expansion
+
+### Context
+
+Last crawl was 2026-02-04 (Session 8). The gallery had ~1,450 items, heavily biased toward US/European manufacturers. No TikTok content was being crawled despite existing crawler code. YouTube search queries were still commented out from initial testing.
+
+### Crawl Run 1: Full Pipeline Re-run (all existing sources)
+
+**Sources:** YouTube channels (27) + YouTube search queries (re-enabled) + News RSS (13 feeds) + SerpAPI news + SerpAPI images + Google Custom Search news + Google Custom Search images
+
+**Change:** Uncommented YouTube search queries in `youtube_crawler.py` — channel crawl was verified since January, no reason to keep them disabled.
+
+**Results:**
+
+| Metric | Count |
+|--------|-------|
+| Items found | 1,721 |
+| Items added (new) | 814 |
+| Items skipped (duplicates) | 907 |
+| Items failed | 0 |
+
+### Crawl Run 2: TikTok Expanded
+
+**Script:** `crawler/src/crawl_tiktok_expanded.py` (standalone, not yet integrated into main.py)
+
+**Results:**
+
+| Metric | Count |
+|--------|-------|
+| TikTok videos found | 409 |
+| Stored (new) | 212 |
+| Skipped (duplicates) | 194 |
+| Errors | 3 |
+
+**Note:** TikTok crawler uses SerpAPI with `site:tiktok.com` queries. Only stores actual video URLs (`/video/` in URL). Items are auto-approved (`status: 'approved'`), unlike main crawler which sets `status: 'pending'`.
+
+### Source Expansion: 19 New YouTube Channels
+
+**Problem identified:** YouTube channel list was entirely US/European. Missing major Chinese, Japanese, Korean manufacturers and humanoid robot companies.
+
+**New channels added to `sources.yaml`:**
+
+| Region | Channels Added |
+|--------|---------------|
+| **China** | Unitree Robotics, UBTECH Robotics, DJI, Geek+ (GeekPlus), Siasun Robot, Dobot Robotics, Flexiv Robotics, Hai Robotics |
+| **Japan** | Kawasaki Robotics, DENSO WAVE, Mujin, SoftBank Robotics |
+| **Korea** | HD Hyundai Robotics, NAVER LABS |
+| **Europe** | Stäubli Robotics (CH), AutoStore (NO), 1X Technologies (NO) |
+| **Humanoids** | Figure AI (US), Sanctuary AI (CA) |
+
+Channel IDs resolved via YouTube Data API v3 `channels().list(forHandle=...)`.
+
+**New search queries added:**
+- 10 industrial queries for Chinese/Asian manufacturers
+- 5 humanoid robot industry queries
+- 5 Asian service robot queries
+- 5 medical robotics queries
+- 4 specialized environment queries
+- Expanded Google/SerpAPI news & image queries for all new categories
+
+### Crawl Run 3: New Sources
+
+**Sources:** YouTube (46 channels + 61 search queries) + SerpAPI + Google Search (with expanded queries)
+
+**Results:**
+
+| Metric | Count |
+|--------|-------|
+| Items found | 1,890 |
+| Items added (new) | 685 |
+| Items skipped (duplicates) | 1,205 |
+| Items failed | 0 |
+
+**Videos from new channels:**
+
+| Channel | Videos |
+|---------|--------|
+| DENSO WAVE | 50 |
+| HD Hyundai Robotics | 50 |
+| UBTECH Robotics | 49 |
+| Stäubli Robotics | 49 |
+| Kawasaki Robotics | 48 |
+| SoftBank Robotics | 48 |
+| AutoStore | 47 |
+| Siasun Robot | 45 |
+| Dobot Robotics | 44 |
+| Unitree Robotics | 42 |
+| NAVER LABS | 40 |
+| Flexiv Robotics | 40 |
+| Sanctuary AI | 31 |
+| Geek+ (GeekPlus) | 28 |
+| Mujin | 26 |
+| Figure AI | 23 |
+| DJI | 21 |
+| 1X Technologies | 17 |
+| Hai Robotics | 1 |
+
+### Total Session Results
+
+| Run | New Items |
+|-----|-----------|
+| Run 1: Full pipeline | 814 |
+| Run 2: TikTok | 212 |
+| Run 3: New sources | 685 |
+| **Total** | **1,711** |
+
+### DB State After Crawls
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Total gallery items | ~1,450 | ~3,161 |
+| YouTube channels configured | 27 | 46 |
+| YouTube search queries | ~45 | ~61 |
+| TikTok content | 0 | 212+ |
+| Source regions | US/EU only | US/EU + China + Japan + Korea + Canada + Norway |
+
+### Known Issues
+
+1. **`gallery_crawler_runs.crawler_type` column is `varchar(50)`** — too short for full source list string like `"youtube,news,serpapi,serpapi_images,google,google_images"`. Non-blocking (crawl completes fine, just fails to log run start). Needs migration to extend to `varchar(200)`.
+
+2. **TikTok crawler is standalone** — `crawl_tiktok_expanded.py` is not integrated into `main.py` orchestrator. Should be added as a `--sources tiktok` option for unified crawling.
+
+3. **TikTok items auto-approved** — The standalone TikTok crawler sets `status: 'approved'` directly, bypassing moderation. Main crawler correctly sets `status: 'pending'`.
+
+4. **`google.generativeai` package deprecated** — FutureWarning on import. Should migrate to `google.genai` package.
+
+### Files Modified
+
+| File | Change |
+|------|--------|
+| `crawler/src/crawlers/youtube_crawler.py` | Re-enabled YouTube search queries (was commented out) |
+| `crawler/config/sources.yaml` | Added 19 new YouTube channels, 16 new YouTube search queries, expanded Google/SerpAPI queries for Asian manufacturers + medical + specialized environments |
+
+### Efficiency Notes for Next Crawl
+
+- **Deduplication is automatic**: `item_exists()` checks `source_type + external_id` before inserting. Safe to re-run the full pipeline without getting duplicates.
+- **YouTube channel crawl**: Only fetches the latest 50 videos per channel. Already-stored videos are skipped by dedup. Fast for incremental updates.
+- **YouTube search queries cost 100 quota units each**. With 61 queries, that's 6,100 units of the 10,000 daily quota. Plan accordingly if running other YouTube API tasks same day.
+- **Run order**: `python src/main.py --sources youtube news serpapi serpapi_images google google_images` covers everything except TikTok. Run `python src/crawl_tiktok_expanded.py` separately for TikTok.
+- **SerpAPI**: ~60 searches for news + ~40 for images. Free tier allows 100/month; paid plan needed for frequent crawls.
+- **All new items from main crawler are `status: 'pending'`** — need moderation/approval before they appear on the public frontend.
+
+---
+
 *Log maintained by development team*
-*Last updated: 2026-02-22*
+*Last updated: 2026-03-16*
