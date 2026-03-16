@@ -55,6 +55,106 @@ youtube:
       default_category: "industrial"
       priority: 2
 
+    # Chinese Robot Manufacturers
+    - id: "UCsMbp4V8oxzHCMdOUP-3oWw"
+      name: "Unitree Robotics"
+      default_category: "industrial"
+      priority: 1
+
+    - id: "UCdYzpvcdKkvlfTc-Abe6cJQ"
+      name: "UBTECH Robotics"
+      default_category: "professional_service"
+      priority: 1
+
+    - id: "UCsNGtpqGsyw0U6qEG-WHadA"
+      name: "DJI"
+      default_category: "industrial"
+      priority: 1
+
+    - id: "UClskdEem4fmf7SyriBVO0Sw"
+      name: "Geek+ (GeekPlus)"
+      default_category: "industrial"
+      priority: 1
+
+    - id: "UCTC0XKnFcW5XmIQQR2dcP9A"
+      name: "Siasun Robot"
+      default_category: "industrial"
+      priority: 1
+
+    - id: "UCgGlyaPWWxKtjHeI-khbHWg"
+      name: "Dobot Robotics"
+      default_category: "industrial"
+      priority: 1
+
+    - id: "UC6J5vIISLwShqi2oHjEmXRA"
+      name: "Flexiv Robotics"
+      default_category: "industrial"
+      priority: 1
+
+    - id: "UCwHGrgTA0pIRFdS2B38liAw"
+      name: "Hai Robotics"
+      default_category: "industrial"
+      priority: 1
+
+    # Japanese Robot Manufacturers
+    - id: "UCn-s3uIywj5hCFwYnQL2Izw"
+      name: "Kawasaki Robotics"
+      default_category: "industrial"
+      priority: 1
+
+    - id: "UC9I8Zbhx2j_bZ4iHQYneR2w"
+      name: "DENSO WAVE"
+      default_category: "industrial"
+      priority: 1
+
+    - id: "UCcy9ZRYN5DIWhk1SP9NcoQg"
+      name: "Mujin"
+      default_category: "industrial"
+      priority: 2
+
+    - id: "UCYQ7LmV5XkMp3sWWer-kWsw"
+      name: "SoftBank Robotics"
+      default_category: "professional_service"
+      priority: 1
+
+    # Korean Robot Manufacturers
+    - id: "UCoeI5F6jLj5kJ93YT_4-isQ"
+      name: "HD Hyundai Robotics"
+      default_category: "industrial"
+      priority: 1
+
+    - id: "UCdYiLrXdXkkvD8WdaG3rstQ"
+      name: "NAVER LABS"
+      default_category: "professional_service"
+      priority: 2
+
+    # European Robot Manufacturers
+    - id: "UCv-xfu3J69ZlELgReZUzRFQ"
+      name: "Staubli Robotics"
+      default_category: "industrial"
+      priority: 1
+
+    - id: "UCxbKfgKxhflFXWvLOC9CR4w"
+      name: "AutoStore"
+      default_category: "industrial"
+      priority: 1
+
+    - id: "UCoHslVexR2q57wUoCRfdUsg"
+      name: "1X Technologies"
+      default_category: "industrial"
+      priority: 1
+
+    # Humanoid Robot Companies
+    - id: "UCYlq-KmwPjc1DtsGmthFqSQ"
+      name: "Figure AI"
+      default_category: "industrial"
+      priority: 1
+
+    - id: "UC_d_dGoi2ztmAgiDwRh3uJw"
+      name: "Sanctuary AI"
+      default_category: "industrial"
+      priority: 1
+
     # Mobile Robots & AMR
     - id: "UCN-StetwWuVYf-MU2_NVj4A"
       name: "Agility Robotics"
@@ -217,6 +317,40 @@ youtube:
       - query: "pick and place robot application"
         tasks: ["manipulation"]
 
+      # Chinese & Asian Robot Manufacturers
+      - query: "Unitree robot warehouse factory"
+        tasks: ["transportation", "manipulation"]
+      - query: "Geek+ GeekPlus warehouse robot deployment"
+        tasks: ["transportation"]
+      - query: "Hai Robotics ACR warehouse automation"
+        tasks: ["transportation"]
+      - query: "Siasun robot industrial automation China"
+        tasks: ["manipulation", "assembly"]
+      - query: "Dobot cobot collaborative robot application"
+        tasks: ["manipulation", "assembly"]
+      - query: "Flexiv adaptive robot manufacturing"
+        tasks: ["manipulation"]
+      - query: "AutoStore cube storage robot warehouse"
+        tasks: ["transportation"]
+      - query: "Mujin robot warehouse picking automation"
+        tasks: ["manipulation", "transportation"]
+      - query: "Hikrobot Hikrobotics mobile robot logistics"
+        tasks: ["transportation"]
+      - query: "Chinese robot factory automation deployment"
+        tasks: ["manipulation", "assembly"]
+
+      # Humanoid Robots in Industry
+      - query: "humanoid robot warehouse factory work"
+        tasks: ["manipulation", "transportation"]
+      - query: "Figure AI humanoid robot deployment"
+        tasks: ["manipulation"]
+      - query: "Tesla Optimus robot factory"
+        tasks: ["manipulation"]
+      - query: "Sanctuary AI Phoenix humanoid"
+        tasks: ["manipulation"]
+      - query: "1X Technologies NEO humanoid robot"
+        tasks: ["manipulation"]
+
     professional_service:
       # Hospital & Healthcare
       - query: "hospital delivery robot real deployment"
@@ -323,6 +457,16 @@ google_search:
       - "robotic palletizer installation"
       - "industrial robot arm factory case study"
       - "automated warehouse system robot"
+      # Asian manufacturers & humanoids
+      - "Geek+ GeekPlus warehouse robot deployment"
+      - "Hai Robotics ACR warehouse automation"
+      - "Unitree humanoid robot factory"
+      - "Chinese robot manufacturer factory deployment"
+      - "Siasun robot industrial automation"
+      - "humanoid robot warehouse deployment 2025 2026"
+      - "Figure AI humanoid robot deployment"
+      - "AutoStore cube storage automation"
+      - "Dobot cobot deployment case study"
 
     professional_service:
       - "hospital robot deployment healthcare"
@@ -333,6 +477,25 @@ google_search:
       - "cleaning robot commercial deployment"
       - "airport robot service"
       - "healthcare robot case study"
+      # Asian service robots
+      - "Pudu robot restaurant deployment Asia"
+      - "Keenon robot hotel service China"
+      - "UBTECH Walker robot service"
+      - "SoftBank Pepper robot retail hospitality"
+      - "NAVER Labs robot delivery office"
+
+    medical:
+      - "surgical robot hospital deployment"
+      - "pharmacy robot automation hospital"
+      - "rehabilitation robot therapy"
+      - "lab automation robot"
+      - "disinfection robot hospital UV"
+
+    specialized_environment:
+      - "underwater robot inspection pipeline"
+      - "nuclear decommission robot"
+      - "hazardous environment robot deployment"
+      - "firefighting robot deployment"
 
     professional_service_security:
       - "security robot patrol deployment"
@@ -353,6 +516,14 @@ google_search:
       - "robotic welding cell"
       - "robot assembly line automotive"
       - "bin picking robot 3D vision"
+      # Asian & humanoid
+      - "Geek+ warehouse robot deployment"
+      - "Hai Robotics ACR warehouse"
+      - "Unitree humanoid robot"
+      - "Figure AI humanoid factory"
+      - "Chinese factory robot automation"
+      - "AutoStore cube storage warehouse"
+      - "Dobot cobot factory"
 
     professional_service:
       - "hospital delivery robot corridor"
@@ -363,6 +534,17 @@ google_search:
       - "retail robot store"
       - "reception robot hotel"
       - "healthcare robot patient"
+      # Asian service robots
+      - "Pudu robot restaurant China"
+      - "Keenon robot hotel"
+      - "SoftBank Pepper robot"
+      - "UBTECH Walker humanoid service"
+
+    medical:
+      - "surgical robot operating room"
+      - "pharmacy dispensing robot hospital"
+      - "rehabilitation robot therapy"
+      - "da Vinci surgical system"
 
     professional_service_security:
       - "security patrol robot building"
