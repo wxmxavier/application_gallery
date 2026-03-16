@@ -57,22 +57,20 @@ class YouTubeCrawler:
                            channel=channel.name,
                            error=str(e))
 
-        # Crawl search queries by category (skip for initial test - expensive quota)
-        # TODO: Re-enable after channel crawl is verified
-        # for category, queries in self.config.youtube_search_queries.items():
-        #     for query_config in queries:
-        #         try:
-        #             search_videos = await self._search_videos(
-        #                 query_config.query,
-        #                 category,
-        #                 query_config.tasks
-        #             )
-        #             items.extend(search_videos)
-        #         except Exception as e:
-        #             logger.error("Search crawl failed",
-        #                        query=query_config.query,
-        #                        error=str(e))
-        logger.info("Skipping search queries for initial test")
+        # Crawl search queries by category
+        for category, queries in self.config.youtube_search_queries.items():
+            for query_config in queries:
+                try:
+                    search_videos = await self._search_videos(
+                        query_config.query,
+                        category,
+                        query_config.tasks
+                    )
+                    items.extend(search_videos)
+                except Exception as e:
+                    logger.error("Search crawl failed",
+                               query=query_config.query,
+                               error=str(e))
 
         logger.info("YouTube crawl complete",
                    total_items=len(items),
