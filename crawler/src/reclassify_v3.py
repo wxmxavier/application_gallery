@@ -14,7 +14,7 @@ load_dotenv()
 # Initialize clients
 supabase = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_ROLE_KEY'))
 genai.configure(api_key=os.getenv('GOOGLE_AI_API_KEY'))
-model = genai.GenerativeModel('gemini-2.0-flash')
+model = genai.GenerativeModel('gemini-2.5-flash-lite')
 
 STRICT_CLASSIFICATION_PROMPT = """You are a STRICT classifier for robotics content. Your job is to distinguish REAL WORLD DEPLOYMENTS from demos, marketing, and promotional content.
 

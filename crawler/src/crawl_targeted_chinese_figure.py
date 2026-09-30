@@ -20,7 +20,7 @@ from googleapiclient.discovery import build
 # Initialize clients
 supabase = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_ROLE_KEY'))
 genai.configure(api_key=os.getenv('GOOGLE_AI_API_KEY'))
-model = genai.GenerativeModel('gemini-2.0-flash')
+model = genai.GenerativeModel('gemini-2.5-flash-lite')
 youtube = build("youtube", "v3", developerKey=os.getenv('YOUTUBE_API_KEY'))
 
 CLASSIFICATION_PROMPT = """Classify this robotics video for the RSIP Application Gallery.

@@ -17,7 +17,7 @@ load_dotenv()
 # Initialize clients
 supabase = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_ROLE_KEY'))
 genai.configure(api_key=os.getenv('GOOGLE_AI_API_KEY'))
-model = genai.GenerativeModel('gemini-2.0-flash')
+model = genai.GenerativeModel('gemini-2.5-flash-lite')
 
 CLASSIFICATION_PROMPT = """Classify this robotics content from LinkedIn.
 

@@ -166,7 +166,7 @@ class RSIPClassifier:
 
         # Configure Gemini
         genai.configure(api_key=self.config.gemini_api_key)
-        self.model = genai.GenerativeModel("gemini-2.0-flash")
+        self.model = genai.GenerativeModel("gemini-2.5-flash-lite")
 
         # Valid values for validation
         self.valid_content_types = [
@@ -248,7 +248,11 @@ class RSIPClassifier:
                 generation_config=genai.GenerationConfig(
                     temperature=0.1,  # Lower temperature for more consistent classification
                     max_output_tokens=1024,
-                )
+                ),
+                # Hard cap so a hung request fails fast instead of retrying with
+                # ~1h backoff (which made the 2.5-flash run take 11h). flash-lite
+                # responds in ~1s, so 60s is a generous ceiling.
+                request_options={"timeout": 60},
             )
 
             # Parse response
