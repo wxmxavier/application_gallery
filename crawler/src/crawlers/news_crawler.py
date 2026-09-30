@@ -5,12 +5,15 @@ Crawls robotics news from RSS feeds.
 """
 import asyncio
 import hashlib
+import ssl
+import certifi
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
 import structlog
 import feedparser
 import aiohttp
+import httpx
 from bs4 import BeautifulSoup
 
 from config import Config, get_config
@@ -56,8 +59,17 @@ class NewsCrawler:
         items = []
 
         try:
+            # Fetch with httpx (certifi CA bundle) rather than letting feedparser use
+            # urllib, which fails SSL verification on macOS Python installs
+            async with httpx.AsyncClient(
+                timeout=30, follow_redirects=True,
+                headers={"User-Agent": "Mozilla/5.0 (compatible; RSIPGalleryBot/1.0)"},
+            ) as client:
+                response = await client.get(source.url)
+                response.raise_for_status()
+
             # Parse RSS feed
-            feed = feedparser.parse(source.url)
+            feed = feedparser.parse(response.content)
 
             if feed.bozo:
                 logger.warning("Feed parsing warning",
@@ -189,7 +201,10 @@ class NewsCrawler:
     async def _fetch_og_image(self, url: str) -> Optional[str]:
         """Fetch Open Graph image from URL"""
         try:
-            async with aiohttp.ClientSession() as session:
+            # Create SSL context with certifi certificates for macOS compatibility
+            ssl_context = ssl.create_default_context(cafile=certifi.where())
+            connector = aiohttp.TCPConnector(ssl=ssl_context)
+            async with aiohttp.ClientSession(connector=connector) as session:
                 async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as response:
                     if response.status != 200:
                         return None

@@ -1749,5 +1749,123 @@ Channel IDs resolved via YouTube Data API v3 `channels().list(forHandle=...)`.
 
 ---
 
+## Session 11: 2026-06-07 - Crawl Refresh & Gemini Model Migration
+
+### Context
+
+Routine crawl refresh requested ("update the videos list"). First full-pipeline run since 2026-03-16. Gallery started at **3,905 items**.
+
+### Critical Bug Found: Gemini 2.0 Flash Retired
+
+The first run completed with `items_added: 0` despite finding 3,020 items — **1,716 classification failures**, all:
+
+```
+404 This model models/gemini-2.0-flash is no longer available.
+```
+
+Google retired the `gemini-2.0-flash` alias on the `generateContent` endpoint (it still appears in `list_models`, but calls 404). This is "Known Issue #4" (deprecated `google.generativeai`) escalating into a hard failure. Because classification failure returns `_get_default_classification()` with `relevance_score: 0.4` (below the `min_relevance_score: 0.6` gate in `main.py`), every new item was silently **skipped, not stored**.
+
+### Fix: Migrate to gemini-2.5-flash-lite + timeout guard
+
+1. **First tried `gemini-2.5-flash`** — worked, but has *thinking* enabled by default. On the structured classification task it was slow (~4s/item) and intermittently `504 Deadline Exceeded`; the SDK retried each timeout with ~1h backoff, making one run take **11 hours**.
+2. **Settled on `gemini-2.5-flash-lite`** (~0.9s/item, thinking off by default) — the faithful fast successor to the non-thinking 2.0-flash the crawler originally used.
+3. Added `request_options={"timeout": 60}` to the classifier's `generate_content` call so a hung request fails fast instead of retrying for an hour.
+
+Updated the model string in **all 8 files** that instantiate `GenerativeModel`: `ai_classifier.py` + 7 standalone crawlers (`crawl_social.py`, `crawl_linkedin_media.py`, `reclassify_v3.py`, `crawl_social_platforms.py`, `crawl_tiktok_expanded.py`, `crawl_targeted_home_fire.py`, `crawl_targeted_chinese_figure.py`).
+
+### Crawl Results (with fixed classifier)
+
+| Run | Sources | Found | Added | Notes |
+|-----|---------|-------|-------|-------|
+| TikTok | SerpAPI `site:tiktok.com` | 388 | **+231** | 0 errors |
+| Non-YouTube | news, serpapi, serpapi_images, google, google_images | 258 | **+102** | all to serpapi_news; SerpAPI then hit "account out of searches" |
+| YouTube | 46 channels + 61 search queries | 1,133 | **+355** | 0 classification failures; 40 search-quota 429s near the end |
+| **Total** | | | **+687** | |
+
+**Gallery: 3,905 → 4,592** (2,556 approved + 2,036 pending). New items are `status: pending` and need moderation before appearing on the public frontend.
+
+### Quota Notes (all reset daily)
+
+- **YouTube Data API**: search quota (~6,100 of 10,000 units for 61 queries) — resets at midnight Pacific (07:00 UTC). The day's first runs exhausted it; the final run captured 355 new videos before partial re-exhaustion.
+- **SerpAPI**: "account has run out of searches" — exhausted for the period after TikTok + non-YouTube runs.
+- **Google Custom Search**: `429 Queries per day` **and** `403 does not have access to Custom Search JSON API` — effectively non-functional (explains why `google`/`google_images` source_types have 0 stored items).
+
+### Still Outstanding
+
+1. **`google.generativeai` SDK is deprecated** — should migrate to the `google.genai` package (FutureWarning on every import). Model migration done; SDK migration not yet.
+2. **`gallery_crawler_runs.crawler_type` is `varchar(50)`** — still too short for the full multi-source string (run-logging fails on the combined-source run, non-blocking). Single-source runs like `youtube` log fine.
+3. **Google Custom Search access** — project lost Custom Search JSON API access (403); needs re-enabling in GCP or removal from the pipeline.
+4. **TikTok crawler still standalone & auto-approves** — not integrated into `main.py`; sets `status: approved` directly, bypassing moderation.
+
+---
+
+## Session 12: 2026-09-30 - Crawl Refresh, Bulk Approval & RSS SSL Fix
+
+### Context
+
+Routine crawl refresh, the first since 2026-06-07. Gallery started at **4,592 items** (2,556 approved + 2,036 pending). Before the run, `gemini-2.5-flash-lite` was smoke-tested because a retired model had silently skipped every item in Session 11. It still works.
+
+### Crawl Results
+
+| Run | Sources | Found | Added | Status on insert |
+|-----|---------|-------|-------|------------------|
+| Main | youtube, news, serpapi, serpapi_images | 2,989 | **1,138** (885 YouTube, 176 SerpAPI news, 77 SerpAPI images) | pending |
+| TikTok | `crawl_tiktok_expanded.py` (SerpAPI `site:tiktok.com`) | 327 | **+264** | approved |
+| News RSS (after SSL fix) | news | 50 | **+8** | pending |
+| **Total** | | | **+1,410** | |
+
+- Skipped `google`/`google_images` because Custom Search API access is still broken (Session 11 issue #3).
+- YouTube used 9,308 of 10,000 daily quota units. No 429s.
+- 0 Gemini classification failures in the main run. A few JSON-parse fallbacks (Gemini returned prose for non-robotics images).
+- About 14 TikTok SerpAPI queries returned an empty `Error:` (e.g. "Boston Dynamics", "delivery robot"). The cause is unknown. The other queries worked.
+- The main run reported `items_added: 1145`, but 7 of those inserts failed (see issue below). 1,138 is the stored count.
+
+### Bulk Approval
+
+All pending items were approved at the stakeholder's request: 3,174 after the crawls, then the 8 new RSS items. The update set `status='approved'` and `moderated_at=now()`.
+
+**Gallery: 4,592 → 6,002 items, all approved (0 pending).**
+
+### Fix: RSS Feeds Returning 0 Items (SSL)
+
+**Symptom:** All 13 RSS feeds logged `SSL: CERTIFICATE_VERIFY_FAILED` and returned 0 items.
+
+**Root cause:** `feedparser.parse(url)` fetches through `urllib`, which uses the macOS Python install's CA store. That store is missing root certificates (the same problem `google_crawler.py` already works around).
+
+**Fix (`crawler/src/crawlers/news_crawler.py`):**
+1. The feed is fetched with `httpx.AsyncClient` (certifi CA bundle, follows redirects, browser-like User-Agent) and the content is passed to `feedparser.parse(response.content)`.
+2. `_fetch_og_image()` now uses an `aiohttp.TCPConnector` with a certifi SSL context, matching the pattern in `google_crawler.py`.
+
+**Result:** 0 → 50 items fetched, no SSL errors.
+
+**Dead feeds found (now visible as HTTP errors):**
+
+| Feed | Error |
+|------|-------|
+| IEEE Spectrum Robotics | 404 |
+| Automation World | 404 |
+| Robotics 24/7 | 404 |
+| Warehouse Automation | 404 |
+| Healthcare IT News | 403 |
+| VentureBeat AI | 429 |
+
+Working feeds: The Robot Report, Robotics Business Review (same feed as The Robot Report, so all its items are duplicates), TechCrunch Robotics, Supply Chain Dive, Hotel Technology News. Modern Materials Handling and Logistics Management respond but had no robotics items in range.
+
+### Bugs Found
+
+1. **`environment_setting` CHECK constraint rejects `"unknown"`.** 8 items were lost today (7 YouTube + 1 news) because the classifier returned `"setting": "unknown"` in `environment_setting` and the DB constraint doesn't allow it. The classifier needs to map unknown settings to an allowed value or null, or the constraint needs to accept `unknown`.
+2. **Admin approve writes a non-existent column.** `approveContent()` in `frontend/src/services/moderation-service.ts` updates `reviewed_at` and `reviewer_notes`, but the table has `moderated_at`. PostgREST returns `PGRST204 Could not find the 'reviewed_at' column`, so approving from the admin UI likely fails. Needs a code fix or a migration.
+
+### Still Outstanding
+
+1. `environment_setting` "unknown" rejection (above)
+2. Admin `approveContent()` column mismatch (above)
+3. Update or remove the 6 dead RSS feed URLs in `sources.yaml`
+4. `google.generativeai` SDK deprecated. Migrate to `google.genai`.
+5. Google Custom Search API access (403)
+6. TikTok crawler still standalone (not in `main.py`)
+
+---
+
 *Log maintained by development team*
-*Last updated: 2026-03-16*
+*Last updated: 2026-09-30*
