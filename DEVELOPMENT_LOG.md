@@ -1865,6 +1865,22 @@ Working feeds: The Robot Report, Robotics Business Review (same feed as The Robo
 5. Google Custom Search API access (403)
 6. TikTok crawler still standalone (not in `main.py`)
 
+### Git Commits This Session
+
+| Hash | Description |
+|------|-------------|
+| `d62ad24` | Migrate classifier to gemini-2.5-flash-lite after gemini-2.0-flash retirement (Session 11 code, 8 files) |
+| `2cbef7c` | Fix RSS feed SSL failures and log Sessions 11-12 crawl results |
+
+Crawl logs are in `crawler/logs/crawl_2026-09-30_{main,tiktok,news}.log` (gitignored).
+
+### Efficiency Notes for Next Crawl
+
+- **Smoke-test Gemini first.** Make one `generate_content` call with the classifier model before a long run. A retired model makes every item get skipped silently.
+- **Run command:** `python src/main.py --sources youtube news serpapi serpapi_images` (omit `google`/`google_images` until Custom Search access is fixed), then `python src/crawl_tiktok_expanded.py`.
+- **Timing:** the main run took about 1h40m and TikTok about 30 minutes.
+- **Approval:** the stakeholder bulk-approves new items after a crawl. Use `moderated_at`, not `reviewed_at`.
+
 ---
 
 *Log maintained by development team*
